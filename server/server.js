@@ -481,23 +481,39 @@ app.delete("/users/:id", (req, res) => {
     });
 });
 
-//TODO: jeśli plik nie istnieje to ten utworzyć
 app.listen(8002, () => {
     if (!fs.existsSync(file_path)) {
         console.log(`Data file not exists`);
         let data = {
-            Users:[],
-            Categories:[],
-            Notes:[]
+            Users: [],
+            Categories: [],
+            Notes: []
         };
-        fs.writeFileSync(file_path,JSON.stringify(data),(err) => {
-            if (err) {
-                console.log(
-                    `Error creating data file`);
-            } else {
-                console.log(`Data file initialized`);
-            }
-        });
+        save(data);
     }
+    fs.readFile(file_path, "utf8", (err, dataJson) => {
+        if (err) {
+            console.log(`Error reading file: ${err}`);
+            return;
+        }
+        var data = JSON.parse(dataJson);
+        var notes = data.Notes;
+        var users = data.Users;
+        var categories = data.Categories;
+        if (notes == undefined)
+            data.Notes = [];
+        if (users == undefined)
+            data.Users = [];
+        if (categories == undefined)
+            data.Categories = [];
+        save(data);
+    });
+
     console.log("Server address http://localhost:8002");
 });
+
+save = (data) => {
+    fs.writeFile(file_path, JSON.stringify(data), (err) => {
+        if (err) console.log(`Error creating data file`);
+    });
+}
