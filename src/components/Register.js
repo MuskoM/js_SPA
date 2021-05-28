@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { setUserSession } from '../utils/Common';
 
-function Login(props) {
+function Register(props) {
   const [loading, setLoading] = useState(false);
   const username = useFormInput('');
   const password = useFormInput('');
@@ -12,7 +12,7 @@ function Login(props) {
   const handleLogin = () => {
     setError(null);
     setLoading(true);
-    axios.post('http://localhost:8002/users/signin', { username: username.value, password: password.value }).then(response => {
+    axios.post('http://localhost:8002/users', { username: username.value, password: password.value }).then(response => {
       setLoading(false);
       setUserSession(response.data.token, response.data.user);
       props.history.push('/dashboard');
@@ -66,4 +66,4 @@ const useFormInput = initialValue => {
   }
 }
 
-export default Login;
+export default Register;

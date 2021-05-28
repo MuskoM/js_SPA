@@ -354,7 +354,6 @@ app.delete("/categories/:id", (req, res) => {
 });
 
 // USER CRUD
-//TODO: do not pass password on get
 app.get("/users", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -363,7 +362,7 @@ app.get("/users", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var users = data.Users;
+        var users = data.Users.map(el => utils.getCleanUser(el));
         console.log(`GET: /users`);
         res.send(users);
     });
@@ -383,7 +382,7 @@ app.get("/users/:id", (req, res) => {
             res.status(500).send(`User with id = ${req.params.id} not found`);
         }
         console.log(`GET: /users/${userBody.id}`);
-        res.send(userBody);
+        res.send(utils.getCleanUser(userBody));
     });
 });
 
@@ -396,15 +395,20 @@ app.post("/users", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var category = data.Users.find((u) => u.id == req.body.id);
-        if (category) {
-            console.log(`User with id = ${req.body.id} already exists`);
-            res
-                .status(500)
-                .send(`User with id = ${req.body.id} already exists`);
-            return;
+        var savedUser = data.Users.find((u) => u.username == req.body.username);
+        if (savedUser) {
+            console.log(`Username = ${req.body.username} already in use`);
+            return res.status(500).json({error: true, message: `Username = ${req.body.username} already in use`, errorKey: 'usernameOccupied'});
         }
-        data.Users.push(req.body);
+        var users = data.Users;
+        users.sort((a,b) => {
+            return a.id > b.id;
+        })
+        var newUser = req.body;
+        if (users.length > 0)
+            newUser.id = users[users.length-1].id + 1;
+        else newUser.id = 1;
+        data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
@@ -515,61 +519,46 @@ app.post('/users/signin', function (req, res) {
     const user = req.body.username;
     const pwd = req.body.password;
 
-    // return 400 status if username/password is not exist
     if (!user || !pwd) {
-        return res.status(400).json({
-            error: true,
-            message: "Username or Password is required."
-        });
+        return res.status(400).json({ error: true, message: `Required credentials`, errorKey: `invalidCredentials` });
     }
 
     var userData = storage.findUserByUsername(user);
 
-    // return 401 status if the credential is not match.
-    if (user !== userData.username || pwd !== userData.password) {
-        return res.status(401).json({
-            error: true,
-            message: "Username or Password is wrong."
-        });
+    if (!userData) {
+        return res.status(401).json({error: true, message: `User not found`, errorKey: `userNotFound`});
     }
 
-    // generate token
+    if (user !== userData.username || pwd !== userData.password) {
+        return res.status(401).json({error: true, message: `Invalid credentials`, errorKey: `invalidCredentials`});
+    }
+
     const token = utils.generateToken(userData);
-    // get basic user details
+
     const userObj = utils.getCleanUser(userData);
-    // return the token along with user details
+
     return res.json({ user: userObj, token });
 });
 
-// verify the token and return it if it's valid
 app.get('/verifyToken', function (req, res) {
-    // check header or url parameters or post parameters for token
     var token = req.query.token;
     if (!token) {
-        return res.status(400).json({
-            error: true,
-            message: "Token is required."
-        });
+        return res.status(400).json({error: true,message: `Token is required.`, errorKey: `tokenError`});
     }
 
-
-    // check token that was passed by decoding token using secret
     jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
-        if (err) return res.status(401).json({
-            error: true,
-            message: "Invalid token."
-        });
+        if (err) return res.status(401).json({ error: true, message: `Invalid token`, errorKey: `defaultError` });
 
         var userData = storage.findUserById(user.userId);
 
-        // return 401 status if the userId does not match.
-        if (user.userId !== userData.id) {
-            return res.status(401).json({
-                error: true,
-                message: "Invalid user."
-            });
+        if (!userData) {
+            return res.status(401).json({ error: true, message: `User not found`, errorKey: `userNotFound` });
         }
-        // get basic user details
+
+        if (user.userId !== userData.id) {
+            return res.status(401).json({ error: true, message: `Invalid user`, errorKey: `invalidCredentials` });
+        }
+
         var userObj = utils.getCleanUser(userData);
         return res.json({ user: userObj, token });
     });
