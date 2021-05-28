@@ -9,7 +9,7 @@ generateToken = (user) => {
 
   var u = {
     userId: user.id,
-    name: user.name,
+    name: user.firstname,
     username: user.username,
     isAdmin: user.isAdmin
   };
@@ -25,7 +25,7 @@ getCleanUser = (user) => {
 
   return {
     userId: user.id,
-    name: user.name,
+    name: user.firstname,
     username: user.username,
     isAdmin: user.isAdmin
   };

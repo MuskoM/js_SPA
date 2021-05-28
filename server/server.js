@@ -413,10 +413,10 @@ app.post("/users", (req, res) => {
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
                 console.log(`Error writing file in POST /users: ${err}`);
-                res.status(500).send(`Error writing file data.json`);
+                res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
             } else {
-                res.status(201).send(req.body);
-                console.log(`Successfully wrote file with data and added new user with id = ${req.body.id}`);
+                console.log(`Successfully wrote file with data and added new user with id = ${newUser.id}`);
+                return res.status(201).json(utils.getCleanUser(newUser));
             }
         });
     });
@@ -451,7 +451,7 @@ app.put("/users/:id", (req, res) => {
                     );
                     res.status(500).send(`Error writing file data.json`);
                 } else {
-                    res.status(201).send(req.body);
+                    res.status(201).send(utils.getCleanUser(req.body));
                     console.log(
                         `Successfully wrote file data.json and added new user with id = ${req.body.id}`
                     );
@@ -468,7 +468,7 @@ app.put("/users/:id", (req, res) => {
                     );
                     res.status(500).send(`Error writing file data`);
                 } else {
-                    res.status(201).send(req.body);
+                    res.status(201).send(utils.getCleanUser(req.body));
                     console.log(
                         `Successfully wrote file data and edit user with old id = ${req.params.id}`
                     );
