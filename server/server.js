@@ -1,8 +1,13 @@
+require('dotenv').config();
 const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const jwt = require('jsonwebtoken');
 const app = express();
+const utils = require('./utils');
+const storage = require('./storage');
+const file_path = "./data.json";
 
 app.use(cors());
 app.use(express.json());
@@ -13,12 +18,32 @@ app.use(
     })
 );
 
-app.get("/", (req, res) => {
-    res.send("Serwer do kalendarza");
+//In all future routes, this helps to know if the request is authenticated or not.
+app.use(function (req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.headers['authorization'];
+    if (!token) return next(); //if no token, continue
+
+    token = token.replace('Bearer ', '');
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+        if (err) {
+            return res.status(401).json({
+                error: true,
+                message: "Invalid user."
+            });
+        } else {
+            req.user = user; //set the user to req so other routes can use it
+            next();
+        }
+    });
 });
 
-const file_path = "./data.json";
+app.get("/", (req, res) => {
+    if (!req.user) return res.status(401).json({ success: false, message: 'Invalid user to access it.' });
+    res.send(`Witaj na serwer do kalendarza ${req.user.name}`);
+});
 
+// NOTES CRUD
 app.get("/notes", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -173,6 +198,7 @@ app.delete("/notes/:id", (req, res) => {
     });
 });
 
+// CATEGORIES CRUD
 app.get("/categories", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -327,6 +353,8 @@ app.delete("/categories/:id", (req, res) => {
     });
 });
 
+// USER CRUD
+//TODO: do not pass password on get
 app.get("/users", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -481,6 +509,73 @@ app.delete("/users/:id", (req, res) => {
     });
 });
 
+// USER LOGIN
+// validate the user credentials
+app.post('/users/signin', function (req, res) {
+    const user = req.body.username;
+    const pwd = req.body.password;
+
+    // return 400 status if username/password is not exist
+    if (!user || !pwd) {
+        return res.status(400).json({
+            error: true,
+            message: "Username or Password is required."
+        });
+    }
+
+    var userData = storage.findUserByUsername(user);
+
+    // return 401 status if the credential is not match.
+    if (user !== userData.username || pwd !== userData.password) {
+        return res.status(401).json({
+            error: true,
+            message: "Username or Password is wrong."
+        });
+    }
+
+    // generate token
+    const token = utils.generateToken(userData);
+    // get basic user details
+    const userObj = utils.getCleanUser(userData);
+    // return the token along with user details
+    return res.json({ user: userObj, token });
+});
+
+// verify the token and return it if it's valid
+app.get('/verifyToken', function (req, res) {
+    // check header or url parameters or post parameters for token
+    var token = req.query.token;
+    if (!token) {
+        return res.status(400).json({
+            error: true,
+            message: "Token is required."
+        });
+    }
+
+
+    // check token that was passed by decoding token using secret
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+        if (err) return res.status(401).json({
+            error: true,
+            message: "Invalid token."
+        });
+
+        var userData = storage.findUserById(user.userId);
+
+        // return 401 status if the userId does not match.
+        if (user.userId !== userData.id) {
+            return res.status(401).json({
+                error: true,
+                message: "Invalid user."
+            });
+        }
+        // get basic user details
+        var userObj = utils.getCleanUser(userData);
+        return res.json({ user: userObj, token });
+    });
+});
+
+// PREPARE SERVER AND DATA
 app.listen(8002, () => {
     if (!fs.existsSync(file_path)) {
         console.log(`Data file not exists`);
@@ -489,7 +584,7 @@ app.listen(8002, () => {
             Categories: [],
             Notes: []
         };
-        save(data);
+        storage.save(data);
     }
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -506,14 +601,9 @@ app.listen(8002, () => {
             data.Users = [];
         if (categories == undefined)
             data.Categories = [];
-        save(data);
+        storage.save(data);
     });
 
     console.log("Server address http://localhost:8002");
 });
 
-save = (data) => {
-    fs.writeFile(file_path, JSON.stringify(data), (err) => {
-        if (err) console.log(`Error creating data file`);
-    });
-}
