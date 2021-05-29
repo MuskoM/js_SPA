@@ -1,8 +1,13 @@
+require('dotenv').config();
 const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const jwt = require('jsonwebtoken');
 const app = express();
+const utils = require('./utils');
+const storage = require('./storage');
+const file_path = "./data.json";
 
 app.use(cors());
 app.use(express.json());
@@ -13,12 +18,32 @@ app.use(
     })
 );
 
-app.get("/", (req, res) => {
-    res.send("Serwer do kalendarza");
+//In all future routes, this helps to know if the request is authenticated or not.
+app.use(function (req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.headers['authorization'];
+    if (!token) return next(); //if no token, continue
+
+    token = token.replace('Bearer ', '');
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+        if (err) {
+            return res.status(401).json({
+                error: true,
+                message: "Invalid user."
+            });
+        } else {
+            req.user = user; //set the user to req so other routes can use it
+            next();
+        }
+    });
 });
 
-const file_path = "./data.json";
+app.get("/", (req, res) => {
+    if (!req.user) return res.status(401).json({ success: false, message: 'Invalid user to access it.' });
+    res.send(`Witaj na serwer do kalendarza ${req.user.name}`);
+});
 
+// NOTES CRUD
 app.get("/notes", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -173,6 +198,7 @@ app.delete("/notes/:id", (req, res) => {
     });
 });
 
+// CATEGORIES CRUD
 app.get("/categories", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -327,6 +353,7 @@ app.delete("/categories/:id", (req, res) => {
     });
 });
 
+// USER CRUD
 app.get("/users", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -335,7 +362,7 @@ app.get("/users", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var users = data.Users;
+        var users = data.Users.map(el => utils.getCleanUser(el));
         console.log(`GET: /users`);
         res.send(users);
     });
@@ -355,7 +382,7 @@ app.get("/users/:id", (req, res) => {
             res.status(500).send(`User with id = ${req.params.id} not found`);
         }
         console.log(`GET: /users/${userBody.id}`);
-        res.send(userBody);
+        res.send(utils.getCleanUser(userBody));
     });
 });
 
@@ -368,23 +395,28 @@ app.post("/users", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var category = data.Users.find((u) => u.id == req.body.id);
-        if (category) {
-            console.log(`User with id = ${req.body.id} already exists`);
-            res
-                .status(500)
-                .send(`User with id = ${req.body.id} already exists`);
-            return;
+        var savedUser = data.Users.find((u) => u.username == req.body.username);
+        if (savedUser) {
+            console.log(`Username = ${req.body.username} already in use`);
+            return res.status(500).json({error: true, message: `Username = ${req.body.username} already in use`, errorKey: 'usernameOccupied'});
         }
-        data.Users.push(req.body);
+        var users = data.Users;
+        users.sort((a,b) => {
+            return a.id > b.id;
+        })
+        var newUser = req.body;
+        if (users.length > 0)
+            newUser.id = users[users.length-1].id + 1;
+        else newUser.id = 1;
+        data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
                 console.log(`Error writing file in POST /users: ${err}`);
-                res.status(500).send(`Error writing file data.json`);
+                res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
             } else {
-                res.status(201).send(req.body);
-                console.log(`Successfully wrote file with data and added new user with id = ${req.body.id}`);
+                console.log(`Successfully wrote file with data and added new user with id = ${newUser.id}`);
+                return res.status(201).json(utils.getCleanUser(newUser));
             }
         });
     });
@@ -419,7 +451,7 @@ app.put("/users/:id", (req, res) => {
                     );
                     res.status(500).send(`Error writing file data.json`);
                 } else {
-                    res.status(201).send(req.body);
+                    res.status(201).send(utils.getCleanUser(req.body));
                     console.log(
                         `Successfully wrote file data.json and added new user with id = ${req.body.id}`
                     );
@@ -436,7 +468,7 @@ app.put("/users/:id", (req, res) => {
                     );
                     res.status(500).send(`Error writing file data`);
                 } else {
-                    res.status(201).send(req.body);
+                    res.status(201).send(utils.getCleanUser(req.body));
                     console.log(
                         `Successfully wrote file data and edit user with old id = ${req.params.id}`
                     );
@@ -481,6 +513,58 @@ app.delete("/users/:id", (req, res) => {
     });
 });
 
+// USER LOGIN
+// validate the user credentials
+app.post('/users/signin', function (req, res) {
+    const user = req.body.username;
+    const pwd = req.body.password;
+
+    if (!user || !pwd) {
+        return res.status(400).json({ error: true, message: `Required credentials`, errorKey: `invalidCredentials` });
+    }
+
+    var userData = storage.findUserByUsername(user);
+
+    if (!userData) {
+        return res.status(401).json({error: true, message: `User not found`, errorKey: `userNotFound`});
+    }
+
+    if (user !== userData.username || pwd !== userData.password) {
+        return res.status(401).json({error: true, message: `Invalid credentials`, errorKey: `invalidCredentials`});
+    }
+
+    const token = utils.generateToken(userData);
+
+    const userObj = utils.getCleanUser(userData);
+
+    return res.json({ user: userObj, token });
+});
+
+app.get('/verifyToken', function (req, res) {
+    var token = req.query.token;
+    if (!token) {
+        return res.status(400).json({error: true,message: `Token is required.`, errorKey: `tokenError`});
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+        if (err) return res.status(401).json({ error: true, message: `Invalid token`, errorKey: `defaultError` });
+
+        var userData = storage.findUserById(user.userId);
+
+        if (!userData) {
+            return res.status(401).json({ error: true, message: `User not found`, errorKey: `userNotFound` });
+        }
+
+        if (user.userId !== userData.id) {
+            return res.status(401).json({ error: true, message: `Invalid user`, errorKey: `invalidCredentials` });
+        }
+
+        var userObj = utils.getCleanUser(userData);
+        return res.json({ user: userObj, token });
+    });
+});
+
+// PREPARE SERVER AND DATA
 app.listen(8002, () => {
     if (!fs.existsSync(file_path)) {
         console.log(`Data file not exists`);
@@ -489,7 +573,7 @@ app.listen(8002, () => {
             Categories: [],
             Notes: []
         };
-        save(data);
+        storage.save(data);
     }
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -506,14 +590,9 @@ app.listen(8002, () => {
             data.Users = [];
         if (categories == undefined)
             data.Categories = [];
-        save(data);
+        storage.save(data);
     });
 
     console.log("Server address http://localhost:8002");
 });
 
-save = (data) => {
-    fs.writeFile(file_path, JSON.stringify(data), (err) => {
-        if (err) console.log(`Error creating data file`);
-    });
-}
