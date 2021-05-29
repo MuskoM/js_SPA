@@ -16,6 +16,7 @@ function Login(props) {
       setLoading(false);
       setUserSession(response.data.token, response.data.user);
       props.history.push('/dashboard');
+      window.location.reload(false);
     }).catch(error => {
       setLoading(false);
       if (error.response.status !== 401 && error.response.status !== 400) {

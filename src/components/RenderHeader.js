@@ -37,7 +37,6 @@ function RenderHeader(){
     <div>
         <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
         <NavLink onClick={refresh} activeClassName="active" to="/dashboard">Dashboard</NavLink>
-  <NavLink onClick={refresh} activeClassName="active" to="/admin-dashboard">AdminDashboard</NavLink>
     </div>
   );
 }
