@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Switch, Route, NavLink } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter, Switch, Route, NavLink } from "react-router-dom";
+import axios from "axios";
 
-import Login from './components/Login';
-import Register from './components/Register';
-import Dashboard from './components/Dashboard';
-import Home from './components/Home';
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Dashboard from "./components/Dashboard";
+import AdminDashboard from "./components/AdminDashboard";
+import Home from "./components/Home";
+import RenderHeader from "./components/RenderHeader";
 
-import PrivateRoute from './utils/PrivateRoute';
-import PublicRoute from './utils/PublicRoute';
-import { getToken, removeUserSession, setUserSession } from './utils/Common';
+import PrivateRoute from "./utils/PrivateRoute";
+import PublicRoute from "./utils/PublicRoute";
+import AdminRoute from "./utils/AdminRoute";
+import { getToken, removeUserSession, setUserSession } from "./utils/Common";
 
 function App() {
   const [authLoading, setAuthLoading] = useState(true);
@@ -20,17 +23,20 @@ function App() {
       return;
     }
 
-    axios.get(`http://localhost:8002/verifyToken?token=${token}`).then(response => {
-      setUserSession(response.data.token, response.data.user);
-      setAuthLoading(false);
-    }).catch(error => {
-      removeUserSession();
-      setAuthLoading(false);
-    });
+    axios
+      .get(`http://localhost:8002/verifyToken?token=${token}`)
+      .then((response) => {
+        setUserSession(response.data.token, response.data.user);
+        setAuthLoading(false);
+      })
+      .catch((error) => {
+        removeUserSession();
+        setAuthLoading(false);
+      });
   }, []);
 
   if (authLoading && getToken()) {
-    return <div className="content">Checking Authentication...</div>
+    return <div className="content">Checking Authentication...</div>;
   }
 
   return (
@@ -38,10 +44,7 @@ function App() {
       <BrowserRouter>
         <div>
           <div className="header">
-            <NavLink exact activeClassName="active" to="/">Home</NavLink>
-            <NavLink activeClassName="active" to="/login">Login</NavLink>
-            <NavLink activeClassName="active" to="/register">Register</NavLink>
-            <NavLink activeClassName="active" to="/dashboard">Dashboard</NavLink>
+            <RenderHeader/>
           </div>
           <div className="content">
             <Switch>
@@ -49,6 +52,7 @@ function App() {
               <PublicRoute path="/login" component={Login} />
               <PublicRoute path="/register" component={Register} />
               <PrivateRoute path="/dashboard" component={Dashboard} />
+              <AdminRoute path="/admin-dashboard" component={AdminDashboard} />
             </Switch>
           </div>
         </div>

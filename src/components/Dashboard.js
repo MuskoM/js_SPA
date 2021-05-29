@@ -1,5 +1,6 @@
 import React from 'react';
 import { getUser, removeUserSession } from '../utils/Common';
+import {DayGridCalendar, WeeklyCalendar} from './Calendar'
 
 function Dashboard(props) {
   const user = getUser();
@@ -12,6 +13,7 @@ function Dashboard(props) {
 
   return (
     <div>
+      <WeeklyCalendar></WeeklyCalendar>
       Welcome {user.name}!<br /><br />
       <input type="button" onClick={handleLogout} value="Logout" />
     </div>

@@ -85,15 +85,26 @@ app.post("/notes", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var note = data.Notes.find((n) => n.id == req.body.id);
-        if (note) {
-            console.log(`Note with id = ${req.body.id} already exists`);
-            res
-                .status(500)
-                .send(`Note with id = ${req.body.id} already exists`);
-            return;
-        }
-        data.Notes.push(req.body);
+
+        let newNote = req.body;
+        let noNotes = data.Notes.length;
+        console.log(noNotes)
+        if(noNotes > 0)
+            newNote.id = noNotes+1
+        else
+            newNote.id = 1
+        console.log(newNote)
+
+        // var note = data.Notes.find((n) => n.id == req.body.id);
+        // if (note) {
+        //     console.log(`Note with id = ${req.body.id} already exists`);
+        //     res
+        //         .status(500)
+        //         .send(`Note with id = ${req.body.id} already exists`);
+        //     return;
+        // }
+
+        data.Notes.push(newNote);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {

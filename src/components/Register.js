@@ -27,13 +27,35 @@ function Register(props) {
         return;
       }
       console.log(error.response.data.errorKey);
+      switch (error.response.data.errorKey) {
+        case 'invalidCredentials':
+          setError("Invalid password or login");
+          break;        
+        case 'userNotFound':
+          setError("Invalid password or login");
+          break;
+        default:
+          setError("Something went wrong. Please try again later.");
+          break;
+      }
     });
     }).catch(error => {
       setLoading(false);
-      console.log(error);
+      setLoading(false);
+      if (error.response.status !== 500) {
+        setError("Something went wrong. Please try again later.");
+        return;
+      }
+      console.log(error.response.data.errorKey);
+      switch (error.response.data.errorKey) {
+        case 'usernameOccupied':
+          setError("Username already in use");
+          break;        
+        default:
+          setError("Something went wrong. Please try again later.");
+          break;
+      }
     });
-
-    
   }
 
   return (
