@@ -53,7 +53,7 @@ class WeeklyCalendar extends React.Component{
             title:'New Event',
             start:arg.startStr,
             end:arg.endStr,
-            allDat:arg.allDay
+            allDate:arg.allDay
         }).then(response =>{
             console.log(response)
         }).catch(error => {
