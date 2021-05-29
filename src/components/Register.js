@@ -15,8 +15,7 @@ function Register(props) {
     setLoading(true);
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
       setLoading(false);
-      setUserSession(response.data.token, response.data.user);
-      props.history.push('/dashboard');
+      props.history.push('/')
     }).catch(error => {
       setLoading(false);
       console.log(error);
