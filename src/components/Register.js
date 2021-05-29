@@ -11,31 +11,29 @@ function Register(props) {
   const [error, setError] = useState(null);
 
   const handleRegister = () => {
+    let userId;
     setError(null);
     setLoading(true);
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
       setLoading(false);
-      props.history.push('/')
+      axios.post('http://localhost:8002/users/signin', { username: username.value, password: password.value }).then(response => {
+      setLoading(false);
+      setUserSession(response.data.token, response.data.user);
+      props.history.push('/dashboard')
+    }).catch(error => {
+      setLoading(false);
+      if (error.response.status !== 401 && error.response.status !== 400) {
+        setError("Something went wrong. Please try again later.");
+        return;
+      }
+      console.log(error.response.data.errorKey);
+    });
     }).catch(error => {
       setLoading(false);
       console.log(error);
-      // if (error.response.status !== 401 && error.response.status !== 400) {
-      //   setError("Something went wrong. Please try again later.");
-      //   return;
-      // }
-      // console.log(error.response.data.errorKey);
-      // switch (error.response.data.errorKey) {
-      //   case 'invalidCredentials':
-      //     setError("Invalid password or login");
-      //     break;        
-      //   case 'userNotFound':
-      //     setError("Invalid password or login");
-      //     break;
-      //   default:
-      //     setError("Something went wrong. Please try again later.");
-      //     break;
-      // }
     });
+
+    
   }
 
   return (
