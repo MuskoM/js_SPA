@@ -1,26 +1,25 @@
-import React, {useState, useEffect} from 'react';
-import { getUser,getToken, getAdmin } from '../utils/Common';
+import React, { useState, useEffect } from 'react';
+import { getUser, getToken, getAdmin } from '../utils/Common';
 import { NavLink } from 'react-router-dom';
 
-function RenderHeader(){
-  const user = getUser();
-  const [value,setValue] = useState();
+function RenderHeader() {
+    const user = getUser();
+    const [value, setValue] = useState();
 
-  const refresh = ()=>{
-    setValue({});
-}
+    const refresh = () => {
+        setValue({});
+    }
 
     if (!getToken())
-    return (
-        <div>
-            <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
-            <NavLink onClick={refresh} activeClassName="active" to="/login">Login</NavLink>
-            <NavLink onClick={refresh} activeClassName="active" to="/register">Register</NavLink>
-        </div>
-    );
+        return (
+            <div>
+                <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
+                <NavLink onClick={refresh} activeClassName="active" to="/login">Login</NavLink>
+                <NavLink onClick={refresh} activeClassName="active" to="/register">Register</NavLink>
+            </div>
+        );
 
-    if (getAdmin())
-    {
+    if (getAdmin()) {
         return (
             <div>
                 <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
@@ -31,14 +30,13 @@ function RenderHeader(){
         )
     }
 
-
-
-  return (
-    <div>
-        <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
-        <NavLink onClick={refresh} activeClassName="active" to="/dashboard">Dashboard</NavLink>
-    </div>
-  );
+    return (
+        <div>
+            <NavLink onClick={refresh} exact activeClassName="active" to="/">Home</NavLink>
+            <NavLink onClick={refresh} activeClassName="active" to="/dashboard">Dashboard</NavLink>
+            <NavLink onClick={refresh} activeClassName="active" to="/logout">Logout</NavLink>
+        </div>
+    );
 }
 
 export default RenderHeader;

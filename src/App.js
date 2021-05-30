@@ -13,6 +13,7 @@ import PrivateRoute from "./utils/PrivateRoute";
 import PublicRoute from "./utils/PublicRoute";
 import AdminRoute from "./utils/AdminRoute";
 import { getToken, removeUserSession, setUserSession } from "./utils/Common";
+import Logout from "./components/Logout";
 
 function App() {
   const [authLoading, setAuthLoading] = useState(true);
@@ -52,6 +53,7 @@ function App() {
               <PublicRoute path="/login" component={Login} />
               <PublicRoute path="/register" component={Register} />
               <PrivateRoute path="/dashboard" component={Dashboard} />
+              <PrivateRoute path="/logout" component={Logout} />
               <AdminRoute path="/admin-dashboard" component={AdminDashboard} />
             </Switch>
           </div>
