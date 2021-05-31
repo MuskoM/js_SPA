@@ -3,7 +3,9 @@ import React from 'react';
 function Home() {
   return (
     <div>
-      Calendar Home Page
+      <p>
+        Calendar Home Page
+      </p>
     </div>
   );
 }

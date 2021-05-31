@@ -3,6 +3,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import axios from 'axios';
 import interactionPlugin from '@fullcalendar/interaction'
 import React from 'react';
+import EventPopup from './EventPopup';
+import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from '@material-ui/core';
 
 
 class DayGridCalendar extends React.Component{
@@ -14,27 +16,31 @@ class WeeklyCalendar extends React.Component{
 
     render(){
         return (
-            <FullCalendar
-              plugins={[ dayGridPlugin,interactionPlugin ]}
-              initialView="dayGridMonth"
-              eventSources={[{
-                id:1,
-                url: 'http://localhost:8002/notes',
-                color: 'orange',   // an option!
-                textColor: 'black',
-                method:'GET'
-              }]}
-              height={window.innerHeight-250}
-              aspectRatio={0.5}
-              selectable={true}
-              select={this.handleDateClick}
-            />
+            <div>
+                <FullCalendar
+                  plugins={[ dayGridPlugin,interactionPlugin ]}
+                  initialView="dayGridMonth"
+                  eventSources={[{
+                    id:1,
+                    url: 'http://localhost:8002/notes',
+                    color: '#ffd400',   // an option!
+                    textColor: 'black',
+                    method:'GET'
+                  }]}
+                  height={window.innerHeight-250}
+                  aspectRatio={0.5}
+                  selectable={true}
+                  select={this.handleDateClick}
+                />
+            </div>
           )
     }
+    
 
     handleDateClick = (arg) => {
         let calendarAPI = arg.view.calendar
         let source = calendarAPI.getEventSources()[0]
+        
         console.log(source)
         //source.context.method = "POST"
         console.log(source)
@@ -58,8 +64,12 @@ class WeeklyCalendar extends React.Component{
             console.log(response)
         }).catch(error => {
             console.log(error)
-        })
-
+        });
+        return (
+            <div>
+                <EventPopup/>
+            </div>
+        )
     }
 
 }

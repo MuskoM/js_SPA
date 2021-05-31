@@ -59,27 +59,33 @@ function Register(props) {
     });
   }
 
+  const handleEnterButton = (event) => {
+    if (event.key === 'Enter') {
+      handleRegister();
+    }
+  }
+
   return (
-    <div>
-      Login<br /><br />
+    <div id="centered">
+      <h3>Register</h3><br /><br />
       <div>
         Username<br />
-        <input type="text" {...username} autoComplete="new-password" />
+        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
       </div>
       <div>
         Firstname<br />
-        <input type="text" {...firstname} autoComplete="new-password" />
+        <input type="text" {...firstname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
       </div>
       <div>
         Lastname<br />
-        <input type="text" {...lastname} autoComplete="new-password" />
+        <input type="text" {...lastname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
       </div>
       <div style={{ marginTop: 10 }}>
         Password<br />
-        <input type="password" {...password} autoComplete="new-password" />
+        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
       </div>
       {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
-      <input type="button" value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading} /><br />
+      <input type="button" class="btn btn-primary" value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading} /><br />
     </div>
   );
 }
