@@ -31,7 +31,7 @@ export default function Table({ columns, data }) {
         value={filterInput}
         onChange={handleFilterChange}
         placeholder={"Search name"}
-        class="input-group mb-3"
+        class="form-control mr-sm-2 mb-3" type="search" aria-label="Search"
       />
       <table class="table" {...getTableProps()}>
         <thead>

@@ -43,7 +43,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <div>
-          <div className="header">
+          <div class="navbar navbar-expand-lg navbar-light bg-light" className="header">
             <RenderHeader/>
           </div>
           <div className="content">
