@@ -397,7 +397,7 @@ app.get("/users/:id", (req, res) => {
     });
 });
 
-
+// Register user
 app.post("/users", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -419,6 +419,7 @@ app.post("/users", (req, res) => {
         if (users.length > 0)
             newUser.id = users[users.length-1].id + 1;
         else newUser.id = 1;
+        if (newUser.isAdmin == undefined) newUser.isAdmin = false;
         data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {

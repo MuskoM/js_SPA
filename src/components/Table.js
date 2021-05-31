@@ -1,26 +1,42 @@
-function Table(props) {
-    const { rows } = props.users;
-    console.log("props",props);
-    console.log("rows", rows);
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>In Stock</th>
+import React from "react";
+import { useTable } from "react-table";
+
+export default function Table({ columns, data }) {
+  console.log(data);
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow
+  } = useTable({
+    columns,
+    data
+  });
+
+  return (
+    <table {...getTableProps()}>
+      <thead>
+        {headerGroups.map(headerGroup => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map(column => (
+              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+            ))}
           </tr>
-        </thead>
-        <tbody>
-          {rows.map(product => (
-            <tr key={rows.userId}>
-              <td>{rows.name}</td>
-              <td>{rows.username}</td>
-              <td>{rows.isAdmin}</td>
+        ))}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row, i) => {
+          prepareRow(row);
+          return (
+            <tr {...row.getRowProps()}>
+              {row.cells.map(cell => {
+                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+              })}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  }
-export default Table;
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
