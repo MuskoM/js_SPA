@@ -27,7 +27,6 @@ class UserList extends React.Component {
       { Header: 'Username', accessor: 'username', },
       { Header: 'Name', accessor: 'name', },
       { Header: 'Role', accessor: 'isAdmin', Cell: ({ cell: { value } }) => {
-        console.log('Value', value);
         const role = value ? 'Administrator' : 'User';
         return (
           <>
