@@ -1,38 +1,62 @@
 import React from "react";
 import axios from "axios";
 import Table from "./Table";
-import Popup from "./Popup";
-import { Dropdown, Selection } from "react-dropdown-now";
+import Switch from "react-switch";
 class UserList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       users: [],
       loading: true,
-      showPopup: false,
+      currentUser: null,
+      checked: false,
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.editUser = this.editUser.bind(this);
+  }
+
+  handleChange(checked) {
+    this.setState({ checked: checked });
   }
 
   editUser = (idx) => {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "block";
     console.log(`edit user ${idx}`);
     console.log(this.state.users[idx]);
-    this.setState({
-      showPopup: !this.state.showPopup,
-    });
+    //this.state.currentUser = this.state.users[idx];
+    console.log('currentUser', this.state.currentUser);
+
+    this.setState({ currentUser: this.state.users[idx] });
+    console.log('currentUser2', this.state.currentUser);
+    console.log(this.state);
   };
 
-  togglePopup = () => {
-    this.setState({
-      showPopup: !this.state.showPopup,
-    });
-  };
+  hideModal = () => {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+  }
+
+  saveChanges = () => {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+    console.log('checked',this.state.checked);
+  }
 
   async getUsersData() {
     const res = await axios.get("http://localhost:8002/users");
-    this.setState({ loading: false, users: res.data, isShowingPopup: false });
+    this.setState({ loading: false, users: res.data });
   }
 
   render() {
+    var modal = document.getElementById("myModal");
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
     if (this.state.loading) this.getUsersData();
     const columns = [
       { Header: "ID", accessor: "userId" },
@@ -68,33 +92,29 @@ class UserList extends React.Component {
     return (
       <div>
         <Table columns={columns} data={this.state.users} />
-        {this.state.showPopup ? (
-          <div className="popup">
-            <div className="popup_inner">
-              <h1>Zmień uprawnienia użytkownika</h1>
-              <div className="popup_dropdown">
-                <Dropdown
-                  placeholder="Select role"
-                  options={["User", "Administrator"]}
-                  value="User"
-                  onChange={(value) => console.log("change!", value)}
-                  onSelect={(value) => console.log("selected!", value)} // always fires once a selection happens even if there is no change
-                  onClose={(closedBySelection) =>
-                    console.log("closedBySelection?:", closedBySelection)
-                  }
-                  onOpen={() => console.log("open!")}
-                />
-              </div>
-              <button
-                class="btn btn-primary"
-                onClick={this.togglePopup.bind(this)}
-              >
-                Zatwierdź
-              </button>
-            </div>
+        <div id="myModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onClick={() => this.hideModal()}>&times;</span>
+            <h3>Edit user:</h3>
+            <p>Username: {this.currentUser != undefined ? this.state.currentUser.username : ''}</p>
+            <p>Name: {this.currentUser != undefined ? this.state.currentUser.name : ''}</p>
+            <label htmlFor="normal-switch">
+              <span>Administrator</span>
+              <Switch
+                onChange={this.handleChange}
+                checked={this.state.checked}
+                id="normal-switch"
+              />
+            </label>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onClick={() => this.saveChanges()}
+            >Submit</button>
           </div>
-        ) : null}
-      </div>
+        </div>
+
+      </div >
     );
   }
 }
