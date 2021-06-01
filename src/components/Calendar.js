@@ -5,6 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import React from 'react';
 import EventPopup from './EventPopup';
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from '@material-ui/core';
+import { store } from 'react-notifications-component';
 
 
 class DayGridCalendar extends React.Component{
@@ -13,6 +14,20 @@ class DayGridCalendar extends React.Component{
 
 
 class WeeklyCalendar extends React.Component{
+
+    notification = {
+        title: "Test notification",
+        message: "You shouldn't see it here.",
+        type: "success",
+        insert: "bottom",
+        container: "bottom-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true
+        }
+      }
 
     render(){
         return (
@@ -55,6 +70,7 @@ class WeeklyCalendar extends React.Component{
             true
         )
 
+        
         axios.post('http://localhost:8002/notes',{
             title:'New Event',
             start:arg.startStr,
@@ -65,6 +81,15 @@ class WeeklyCalendar extends React.Component{
         }).catch(error => {
             console.log(error)
         });
+
+        store.addNotification({
+            ...this.notification,
+            title: "Success!",
+            message: "Added new event to calendar.",
+            type: "success"
+        });
+
+
         return (
             <div>
                 <EventPopup/>

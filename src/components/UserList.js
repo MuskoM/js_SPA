@@ -2,6 +2,8 @@ import React from "react";
 import axios from "axios";
 import Table from "./Table";
 import Switch from "react-switch";
+import { store } from 'react-notifications-component';
+
 class UserList extends React.Component {
   constructor(props) {
     super(props);
@@ -11,6 +13,20 @@ class UserList extends React.Component {
       currentUser: null,
       checked: false,
     };
+  }
+
+  notification = {
+    title: "Test notification",
+    message: "You shouldn't see it here.",
+    type: "success",
+    insert: "bottom",
+    container: "bottom-right",
+    animationIn: ["animate__animated", "animate__fadeIn"],
+    animationOut: ["animate__animated", "animate__fadeOut"],
+    dismiss: {
+      duration: 5000,
+      onScreen: true
+    }
   }
 
   editUser = (row) => {
@@ -46,8 +62,20 @@ class UserList extends React.Component {
     var user = this.state.currentUser;
     axios.delete('http://localhost:8002/users/' + user.userId).then(response => {
       this.setState({ loading: true }); //To update data
+      store.addNotification({
+        ...this.notification,
+        title: "Success!",
+        message: "Deleted user from database.",
+        type: "success"
+      });
     }).catch(error => {
-      console.log(error); //TODO: notification
+      console.log(error);
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: error,
+        type: "danger"
+      });
     });
   }
 
@@ -59,8 +87,20 @@ class UserList extends React.Component {
     console.log('User to save:', user);
     axios.put('http://localhost:8002/users/' + user.userId, { username: user.username, isAdmin: user.isAdmin }).then(response => {
       this.setState({ loading: true }); //To update data
+      store.addNotification({
+        ...this.notification,
+        title: "Success!",
+        message: "Made changes in database.",
+        type: "success"
+      });
     }).catch(error => {
-      console.log(error); //TODO: notification
+      console.log(error);
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: error,
+        type: "danger"
+      });
     });
 
   }
