@@ -454,6 +454,7 @@ app.put("/users/:id", (req, res) => {
         }
         var user = data.Users.find((u) => u.id == req.params.id);
         if (!user) {
+            if (res.body.password === undefined) req.body.password = user.password; //TODO: to samo z pozostałymi pustymi polami
             data.Users.push(req.body);
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
