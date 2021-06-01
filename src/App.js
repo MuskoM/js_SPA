@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import axios from "axios";
+import ReactNotification from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
 
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -44,6 +46,7 @@ function App() {
 
   return (
     <div className="App">
+      <ReactNotification/>
       <BrowserRouter>
         <div>
           <div class="navbar navbar-expand-lg navbar-light bg-light" className="header">
