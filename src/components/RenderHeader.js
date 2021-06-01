@@ -119,6 +119,15 @@ function RenderHeader() {
               </NavLink>
             </Button>
             <Button color="inherit">
+              <NavLink
+                onClick={refresh}
+                activeClassName="active"
+                to="/edit-user"
+              >
+                Edit User
+              </NavLink>
+            </Button>
+            <Button color="inherit">
               <NavLink onClick={refresh} activeClassName="active" to="/logout">
                 Logout
               </NavLink>
@@ -161,6 +170,11 @@ function RenderHeader() {
               Notes
             </NavLink>
           </Button>
+          <Button color="inherit">
+              <NavLink onClick={refresh} activeClassName="active" to="/edit-user" >
+                Edit User
+              </NavLink>
+            </Button>
           <Button color="inherit">
             <NavLink onClick={refresh} activeClassName="active" to="/logout">
               Logout

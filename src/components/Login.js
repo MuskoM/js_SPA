@@ -49,11 +49,11 @@ function Login(props) {
       <h3>Login</h3><br /><br />
       <div>
         Username<br />
-        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       <div style={{ marginTop: 10 }}>
         Password<br />
-        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
       <input type="button" class="btn btn-primary" value={loading ? 'Loading...' : 'Login'} onClick={handleLogin} disabled={loading} /><br />

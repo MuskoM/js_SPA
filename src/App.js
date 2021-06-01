@@ -9,7 +9,8 @@ import AdminDashboard from "./components/AdminDashboard";
 import Home from "./components/Home";
 import RenderHeader from "./components/RenderHeader";
 import Logout from './components/Logout';
-import NotesList from './components/NotesList'
+import NotesList from './components/NotesList';
+import EditUser from './components/EditUser';
 
 import PrivateRoute from "./utils/PrivateRoute";
 import PublicRoute from "./utils/PublicRoute";
@@ -55,6 +56,7 @@ function App() {
               <PublicRoute path="/register" component={Register} />
               <PrivateRoute path="/dashboard" component={Dashboard} />
               <PrivateRoute path="/notesList" component={NotesList} />
+              <PrivateRoute path="/edit-user" component={EditUser} />
               <PrivateRoute path="/logout" component={Logout} />
               <AdminRoute path="/admin-dashboard" component={AdminDashboard} />
             </Switch>

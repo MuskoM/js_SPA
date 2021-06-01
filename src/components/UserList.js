@@ -57,7 +57,7 @@ class UserList extends React.Component {
     var user = this.state.currentUser;
     user.isAdmin = this.state.checked;
     console.log('User to save:', user);
-    axios.put('http://localhost:8002/users/' + user.userId, { username: user.username, firstname: user.name, isAdmin: user.isAdmin }).then(response => {
+    axios.put('http://localhost:8002/users/' + user.userId, { username: user.username, isAdmin: user.isAdmin }).then(response => {
       this.setState({ loading: true }); //To update data
     }).catch(error => {
       console.log(error); //TODO: notification

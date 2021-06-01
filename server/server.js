@@ -426,7 +426,7 @@ app.post("/users", (req, res) => {
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
                 console.log(`Error writing file in POST /users: ${err}`);
-                res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
+                return res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
             } else {
                 console.log(`Successfully wrote file with data and added new user with id = ${newUser.id}`);
                 return res.status(201).json(utils.getCleanUser(newUser));
@@ -471,7 +471,16 @@ app.put("/users/:id", (req, res) => {
                 }
             });
         } else {
-            console.log(req.body);
+            if (req.body.oldPassword != null) {
+                if (user.password !== req.body.oldPassword){
+                    console.log('Invalid old password');
+                    return res.status(500).json({errorKey: `wrongPassword`});
+                }
+                if (user.password === req.body.password){
+                    console.log(`Password already used`);
+                    return res.status(500).json({errorKey: `alreadyUsedPassword`});
+                }
+            }
             var editedUser = {
                 id: req.params.id,
                 username: req.body.username != null ? req.body.username : user.username,

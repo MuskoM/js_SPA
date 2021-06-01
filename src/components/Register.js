@@ -8,38 +8,43 @@ function Register(props) {
   const password = useFormInput('');
   const firstname = useFormInput('');
   const lastname = useFormInput('');
+  const confirmPassword = useFormInput('');
   const [error, setError] = useState(null);
 
   const handleRegister = () => {
     let userId;
     setError(null);
     setLoading(true);
+    if (confirmPassword.value != password.value) {
+      setError("Passwords don't match");
+      return;
+    }
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
       setLoading(false);
       axios.post('http://localhost:8002/users/signin', { username: username.value, password: password.value }).then(response => {
-      setLoading(false);
-      setUserSession(response.data.token, response.data.user);
-      props.history.push('/dashboard')
-      window.location.reload(false);
-    }).catch(error => {
-      setLoading(false);
-      if (error.response.status !== 401 && error.response.status !== 400) {
-        setError("Something went wrong. Please try again later.");
-        return;
-      }
-      console.log(error.response.data.errorKey);
-      switch (error.response.data.errorKey) {
-        case 'invalidCredentials':
-          setError("Invalid password or login");
-          break;        
-        case 'userNotFound':
-          setError("Invalid password or login");
-          break;
-        default:
+        setLoading(false);
+        setUserSession(response.data.token, response.data.user);
+        props.history.push('/dashboard')
+        window.location.reload(false);
+      }).catch(error => {
+        setLoading(false);
+        if (error.response.status !== 401 && error.response.status !== 400) {
           setError("Something went wrong. Please try again later.");
-          break;
-      }
-    });
+          return;
+        }
+        console.log(error.response.data.errorKey);
+        switch (error.response.data.errorKey) {
+          case 'invalidCredentials':
+            setError("Invalid password or login");
+            break;
+          case 'userNotFound':
+            setError("Invalid password or login");
+            break;
+          default:
+            setError("Something went wrong. Please try again later.");
+            break;
+        }
+      });
     }).catch(error => {
       setLoading(false);
       setLoading(false);
@@ -51,7 +56,7 @@ function Register(props) {
       switch (error.response.data.errorKey) {
         case 'usernameOccupied':
           setError("Username already in use");
-          break;        
+          break;
         default:
           setError("Something went wrong. Please try again later.");
           break;
@@ -70,19 +75,23 @@ function Register(props) {
       <h3>Register</h3><br /><br />
       <div>
         Username<br />
-        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       <div>
         Firstname<br />
-        <input type="text" {...firstname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="text" {...firstname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       <div>
         Lastname<br />
-        <input type="text" {...lastname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="text" {...lastname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       <div style={{ marginTop: 10 }}>
         Password<br />
-        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton}/>
+        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20' />
+      </div>
+      <div style={{ marginTop: 10 }}>
+        Confirm Password<br />
+        <input type="password" {...confirmPassword} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
       <input type="button" class="btn btn-primary" value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading} /><br />
