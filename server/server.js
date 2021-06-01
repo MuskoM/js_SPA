@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const utils = require('./utils');
 const storage = require('./storage');
+const { isError } = require('util');
 const file_path = "./data.json";
 
 app.use(cors());
@@ -454,7 +455,6 @@ app.put("/users/:id", (req, res) => {
         }
         var user = data.Users.find((u) => u.id == req.params.id);
         if (!user) {
-            if (res.body.password === undefined) req.body.password = user.password; //TODO: to samo z pozostałymi pustymi polami
             data.Users.push(req.body);
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
@@ -471,8 +471,17 @@ app.put("/users/:id", (req, res) => {
                 }
             });
         } else {
+            console.log(req.body);
+            var editedUser = {
+                id: req.params.id,
+                username: req.body.username != null ? req.body.username : user.username,
+                firstname: req.body.firstname != null ? req.body.firstname : user.firstname,
+                lastname: req.body.lastname != null ? req.body.lastname : user.lastname,
+                password: req.body.password != null ? req.body.password : user.password, //TODO:
+                isAdmin: req.body.isAdmin != null ? req.body.isAdmin : user.isAdmin
+            }
             var idx = data.Users.findIndex((n) => n.id == req.params.id);
-            data.Users[idx] = req.body;
+            data.Users[idx] = editedUser;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
                 if (err) {

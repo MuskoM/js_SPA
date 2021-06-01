@@ -11,42 +11,49 @@ class UserList extends React.Component {
       currentUser: null,
       checked: false,
     };
-    // this.handleChange = this.handleChange.bind(this);
-    // this.editUser = this.editUser.bind(this);
+  }
+
+  editUser = (row) => {
+    var user = row.values;
+    this.setState({ currentUser: user, checked: user.isAdmin });
+    var username = document.getElementById("username");
+    var name = document.getElementById("name");
+    username.innerHTML = `Username: ${user.username}`;
+    name.innerHTML = `Name: ${user.name}`;
+    this.showModal("editModal");
+  };
+
+  deleteUser = (row) => {
+    var user = row.values;
+    var id = user.userId;
+    this.setState({ currentUser: user });
+    console.log(row.values);
+    console.log(`Delete user with id ${id}`);
+    var username = document.getElementById("usernameDelete");
+    var name = document.getElementById("nameDelete");
+    username.innerHTML = `Username: ${user.username}`;
+    name.innerHTML = `Name: ${user.name}`;
+    this.showModal("deleteModal");
   }
 
   handleChange = (checked) => {
     this.setState({ checked: checked });
   }
 
-  editUser = (row) => {
-    var user = row.values;
-    console.log('Row', row.values);
-    this.setState({ currentUser: user, checked: user.isAdmin });
-    console.log('currentUser', this.state.currentUser);
-    var username = document.getElementById("username");
-    var name = document.getElementById("name");
-    username.innerHTML = `Username: ${user.username}`;
-    name.innerHTML = `Name: ${user.name}`;
-    this.showModal();
-  };
-
-  showModal = () => {
-    var modal = document.getElementById("myModal");
-    modal.style.display = "block";
-    console.log('currentUser w show', this.state.currentUser);
-  }
-
-  hideModal = () => {
-    var modal = document.getElementById("myModal");
+  submitDelete = () => {
+    var modal = document.getElementById("deleteModal");
     modal.style.display = "none";
-    console.log('currentUser w hide', this.state.currentUser);
+    var user = this.state.currentUser;
+    axios.delete('http://localhost:8002/users/' + user.userId).then(response => {
+      this.setState({ loading: true }); //To update data
+    }).catch(error => {
+      console.log(error); //TODO: notification
+    });
   }
 
   saveChanges = () => {
-    var modal = document.getElementById("myModal");
+    var modal = document.getElementById("editModal");
     modal.style.display = "none";
-    console.log('checked', this.state.checked);
     var user = this.state.currentUser;
     user.isAdmin = this.state.checked;
     console.log('User to save:', user);
@@ -58,17 +65,31 @@ class UserList extends React.Component {
 
   }
 
+  showModal = (name) => {
+    var modal = document.getElementById(name);
+    modal.style.display = "block";
+  }
+
+  hideModal = (name) => {
+    var modal = document.getElementById(name);
+    modal.style.display = "none";
+  }
+
   async getUsersData() {
     const res = await axios.get("http://localhost:8002/users");
     this.setState({ loading: false, users: res.data });
   }
 
   render() {
-    var modal = document.getElementById("myModal");
+    var editModal = document.getElementById("editModal");
+    var deleteModal = document.getElementById("deleteModal");
 
     window.onclick = function (event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
+      if (event.target == editModal) {
+        editModal.style.display = "none";
+      }
+      if (event.target == deleteModal) {
+        editModal.style.display = "none";
       }
     }
 
@@ -97,14 +118,26 @@ class UserList extends React.Component {
           </button>
         ),
       },
+      {
+        accessor: "[deleteButton]",
+        Cell: (cellObj) => (
+          <button
+            type="button"
+            class="btn btn-primary"
+            onClick={() => this.deleteUser(cellObj.row)}
+          >
+            Delete
+          </button>
+        ),
+      },
     ];
 
     return (
       <div>
         <Table columns={columns} data={this.state.users} />
-        <div id="myModal" class="modal">
+        <div id="editModal" class="modal">
           <div class="modal-content">
-            <span class="close" onClick={() => this.hideModal()}>&times;</span>
+            <span class="close" onClick={() => this.hideModal("editModal")}>&times;</span>
             <h3>Edit user:</h3>
             <p id="username">Username: </p>
             <p id="name">Name: </p>
@@ -123,7 +156,19 @@ class UserList extends React.Component {
             >Submit</button>
           </div>
         </div>
-
+        <div id="deleteModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onClick={() => this.hideModal("deleteModal")}>&times;</span>
+            <h3>Are you sure you want to delete user?</h3>
+            <p id="usernameDelete">Username: </p>
+            <p id="nameDelete">Name: </p>
+            <button
+              type="button"
+              class="btn btn-primary btn-danger"
+              onClick={() => this.submitDelete()}
+            >Yes</button>
+          </div>
+        </div>
       </div >
     );
   }
