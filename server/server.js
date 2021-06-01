@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const utils = require('./utils');
 const storage = require('./storage');
+const { isError } = require('util');
 const file_path = "./data.json";
 
 app.use(cors());
@@ -85,15 +86,26 @@ app.post("/notes", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var note = data.Notes.find((n) => n.id == req.body.id);
-        if (note) {
-            console.log(`Note with id = ${req.body.id} already exists`);
-            res
-                .status(500)
-                .send(`Note with id = ${req.body.id} already exists`);
-            return;
-        }
-        data.Notes.push(req.body);
+
+        let newNote = req.body;
+        let noNotes = data.Notes.length;
+        console.log(noNotes)
+        if(noNotes > 0)
+            newNote.id = noNotes+1
+        else
+            newNote.id = 1
+        console.log(newNote)
+
+        // var note = data.Notes.find((n) => n.id == req.body.id);
+        // if (note) {
+        //     console.log(`Note with id = ${req.body.id} already exists`);
+        //     res
+        //         .status(500)
+        //         .send(`Note with id = ${req.body.id} already exists`);
+        //     return;
+        // }
+
+        data.Notes.push(newNote);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
@@ -386,7 +398,7 @@ app.get("/users/:id", (req, res) => {
     });
 });
 
-
+// Register user
 app.post("/users", (req, res) => {
     fs.readFile(file_path, "utf8", (err, dataJson) => {
         if (err) {
@@ -408,12 +420,13 @@ app.post("/users", (req, res) => {
         if (users.length > 0)
             newUser.id = users[users.length-1].id + 1;
         else newUser.id = 1;
+        if (newUser.isAdmin == undefined) newUser.isAdmin = false;
         data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
                 console.log(`Error writing file in POST /users: ${err}`);
-                res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
+                return res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
             } else {
                 console.log(`Successfully wrote file with data and added new user with id = ${newUser.id}`);
                 return res.status(201).json(utils.getCleanUser(newUser));
@@ -458,8 +471,26 @@ app.put("/users/:id", (req, res) => {
                 }
             });
         } else {
+            if (req.body.oldPassword != null) {
+                if (user.password !== req.body.oldPassword){
+                    console.log('Invalid old password');
+                    return res.status(500).json({errorKey: `wrongPassword`});
+                }
+                if (user.password === req.body.password){
+                    console.log(`Password already used`);
+                    return res.status(500).json({errorKey: `alreadyUsedPassword`});
+                }
+            }
+            var editedUser = {
+                id: req.params.id,
+                username: req.body.username != null ? req.body.username : user.username,
+                firstname: req.body.firstname != null ? req.body.firstname : user.firstname,
+                lastname: req.body.lastname != null ? req.body.lastname : user.lastname,
+                password: req.body.password != null ? req.body.password : user.password, //TODO:
+                isAdmin: req.body.isAdmin != null ? req.body.isAdmin : user.isAdmin
+            }
             var idx = data.Users.findIndex((n) => n.id == req.params.id);
-            data.Users[idx] = req.body;
+            data.Users[idx] = editedUser;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
                 if (err) {

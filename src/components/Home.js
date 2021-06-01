@@ -2,8 +2,10 @@ import React from 'react';
 
 function Home() {
   return (
-    <div>
-      Calendar Home Page
+    <div id="centered">
+      <h1>
+        Calendar.app
+      </h1>
     </div>
   );
 }

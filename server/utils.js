@@ -26,6 +26,7 @@ getCleanUser = (user) => {
   return {
     userId: user.id,
     name: user.firstname,
+    lastname: user.lastname,
     username: user.username,
     isAdmin: user.isAdmin
   };

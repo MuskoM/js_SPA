@@ -16,6 +16,7 @@ function Login(props) {
       setLoading(false);
       setUserSession(response.data.token, response.data.user);
       props.history.push('/dashboard');
+      window.location.reload(false); //TODO: zobaczyć czy się da zmienić kolejnośc
     }).catch(error => {
       setLoading(false);
       if (error.response.status !== 401 && error.response.status !== 400) {
@@ -37,19 +38,25 @@ function Login(props) {
     });
   }
 
+  const handleEnterButton = (event) => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  }
+
   return (
-    <div>
-      Login<br /><br />
+    <div id="centered">
+      <h3>Login</h3><br /><br />
       <div>
         Username<br />
-        <input type="text" {...username} autoComplete="new-password" />
+        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       <div style={{ marginTop: 10 }}>
         Password<br />
-        <input type="password" {...password} autoComplete="new-password" />
+        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
       </div>
       {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
-      <input type="button" value={loading ? 'Loading...' : 'Login'} onClick={handleLogin} disabled={loading} /><br />
+      <input type="button" class="btn btn-primary" value={loading ? 'Loading...' : 'Login'} onClick={handleLogin} disabled={loading} /><br />
     </div>
   );
 }
