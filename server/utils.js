@@ -11,6 +11,7 @@ generateToken = (user) => {
     userId: user.id,
     name: user.firstname,
     username: user.username,
+    lastname: user.lastname,
     isAdmin: user.isAdmin
   };
 
