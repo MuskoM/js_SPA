@@ -65,6 +65,12 @@ function EditUser(props) {
     setLoading(true);
     if (confirmPassword.value != password.value) {
       setError("Passwords don't match");
+      store.addNotification({
+        ...notification,
+        title: "Error!",
+        message: "Passwords don't match.",
+        type: "danger"
+      });
       setLoading(false);
       return;
     }
