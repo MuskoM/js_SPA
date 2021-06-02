@@ -137,7 +137,8 @@ class UserList extends React.Component {
     const columns = [
       { Header: "ID", accessor: "userId" },
       { Header: "Username", accessor: "username" },
-      { Header: "Name", accessor: "name" },
+      { Header: "Firstname", accessor: "name" },
+      { Header: "Lastname", accessor: "lastname" },
       {
         Header: "Role",
         accessor: "isAdmin",
@@ -147,27 +148,24 @@ class UserList extends React.Component {
         },
       },
       {
-        accessor: "[editButton]",
+        accessor: "[buttons]",
         Cell: (cellObj) => (
+          <>
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-primary mr-4"
             onClick={() => this.editUser(cellObj.row)}
           >
             Edit
           </button>
-        ),
-      },
-      {
-        accessor: "[deleteButton]",
-        Cell: (cellObj) => (
-          <button
+          <button 
             type="button"
             class="btn btn-primary"
             onClick={() => this.deleteUser(cellObj.row)}
           >
             Delete
           </button>
+          </>
         ),
       },
     ];

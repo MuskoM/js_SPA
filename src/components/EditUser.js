@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { setUserSession } from '../utils/Common';
 
 function EditUser(props) {
   const [loading, setLoading] = useState(false);
@@ -19,14 +18,13 @@ function EditUser(props) {
         setError("Name cannot be empty");
         return;
     }
-    console.log(firstname.value);
+
     axios.put('http://localhost:8002/users/' + user.userId, { firstname: firstname.value, lastname: lastname.value }).then(response => {
         setLoading(false);
-        console.log(response.data);
+        setError('Name changes saved successfully.');
       }).catch(error => {
         setLoading(false);
-        setLoading(false);
-        setError("Something went wrong. Please try again later." + error); //TODO change error
+        setError("Something went wrong. Please try again later.");
       });
   }
 
@@ -42,42 +40,19 @@ function EditUser(props) {
 
     axios.put('http://localhost:8002/users/' + user.userId, { password: password.value, oldPassword: oldPassword.value }).then(response => {
         setLoading(false);
-        console.log(response.data);
-        axios.post('http://localhost:8002/users/signin', { username: response.data.username, password: password.value }).then(response => {
-          setLoading(false);
-          setUserSession(response.data.token, response.data.user);
-        }).catch(error => {
-          setLoading(false);
-          if (error.response.status !== 401 && error.response.status !== 400) {
-            setError("Something went wrong. Please try again later.");
-            return;
-          }
-          console.log(error.response.data.errorKey);
-          switch (error.response.data.errorKey) {
-            case 'invalidCredentials':
-              setError("Invalid password or login");
-              break;
-            case 'userNotFound':
-              setError("Invalid password or login");
-              break;
-            default:
-              setError("Something went wrong. Please try again later.");
-              break;
-          }
-        });
+        setError(`Password updated successfully.`); //TODO NOTIFICATION
       }).catch(error => {
         setLoading(false);
-        console.log(error.response.data)
         switch (error.response.data.errorKey) {
             case 'wrongPassword':
               setError("Invalid password");
-              break;
+              return;
             case 'alreadyUsedPassword':
               setError("Password is the same as old one");
-              break;
+              return;
             default:
               setError("Something went wrong. Please try again later.");
-              break;
+              return;
           }
       });
   }
@@ -88,11 +63,7 @@ function EditUser(props) {
     }
   }
   var user = JSON.parse(sessionStorage.user);
-  console.log(user);
-  var res = axios.get("http://localhost:8002/users/" + user.userId).then(response => {
 
-  });
-  console.log(res.data);
   return (
     <div id="centered">
       <h3>User Edit</h3><br /><br />
