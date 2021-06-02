@@ -79,6 +79,12 @@ function EditUser(props) {
     axios.put('http://localhost:8002/users/' + user.userId, { password: password.value, oldPassword: oldPassword.value }).then(response => {
       setLoading(false);
       setError(`Password updated successfully.`); //TODO NOTIFICATION
+      store.addNotification({
+        ...notification,
+        title: "Success!",
+        message: "Password updated successfully.",
+        type: "success"
+      });
     }).catch(error => {
       setLoading(false);
       switch (error.response.data.errorKey) {
