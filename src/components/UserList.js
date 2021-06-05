@@ -2,7 +2,9 @@ import React from "react";
 import axios from "axios";
 import Table from "./Table";
 import Switch from "react-switch";
-import { store } from 'react-notifications-component';
+import { store } from "react-notifications-component";
+import { FormControlLabel, TextField } from "@material-ui/core";
+import {PrimaryButton,DangerButton} from "./Buttons/PrimaryButton";
 
 class UserList extends React.Component {
   constructor(props) {
@@ -25,17 +27,17 @@ class UserList extends React.Component {
     animationOut: ["animate__animated", "animate__fadeOut"],
     dismiss: {
       duration: 5000,
-      onScreen: true
-    }
-  }
+      onScreen: true,
+    },
+  };
 
   editUser = (row) => {
     var user = row.values;
-    this.setState({ currentUser: user, checked: user.isAdmin });
+    this.setState({ currentUser: user, checked: user.isAdmin, editedUser: user });
     var username = document.getElementById("username");
     var name = document.getElementById("name");
-    username.innerHTML = `Username: ${user.username}`;
-    name.innerHTML = `Name: ${user.name}`;
+    username.value = `${user.username}`;
+    name.value = `${user.name}`;
     this.showModal("editModal");
   };
 
@@ -47,73 +49,85 @@ class UserList extends React.Component {
     console.log(`Delete user with id ${id}`);
     var username = document.getElementById("usernameDelete");
     var name = document.getElementById("nameDelete");
-    username.innerHTML = `Username: ${user.username}`;
-    name.innerHTML = `Name: ${user.name}`;
+    username.value = `${user.username}`;
+    name.value = `${user.name}`;
     this.showModal("deleteModal");
-  }
+  };
 
   handleChange = (checked) => {
     this.setState({ checked: checked });
+  };
+
+  handleTextInput = (evt) =>{
+
   }
 
   submitDelete = () => {
     var modal = document.getElementById("deleteModal");
     modal.style.display = "none";
     var user = this.state.currentUser;
-    axios.delete('http://localhost:8002/users/' + user.userId).then(response => {
-      this.setState({ loading: true }); //To update data
-      store.addNotification({
-        ...this.notification,
-        title: "Success!",
-        message: "Deleted user from database.",
-        type: "success"
+    axios
+      .delete("http://localhost:8002/users/" + user.userId)
+      .then((response) => {
+        this.setState({ loading: true }); //To update data
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Deleted user from database.",
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        store.addNotification({
+          ...this.notification,
+          title: "Error!",
+          message: error,
+          type: "danger",
+        });
       });
-    }).catch(error => {
-      console.log(error);
-      store.addNotification({
-        ...this.notification,
-        title: "Error!",
-        message: error,
-        type: "danger"
-      });
-    });
-  }
+  };
 
   saveChanges = () => {
     var modal = document.getElementById("editModal");
     modal.style.display = "none";
     var user = this.state.currentUser;
     user.isAdmin = this.state.checked;
-    console.log('User to save:', user);
-    axios.put('http://localhost:8002/users/' + user.userId, { username: user.username, isAdmin: user.isAdmin }).then(response => {
-      this.setState({ loading: true }); //To update data
-      store.addNotification({
-        ...this.notification,
-        title: "Success!",
-        message: "Made changes in database.",
-        type: "success"
+    console.log("User to save:", user);
+    axios
+      .put("http://localhost:8002/users/" + user.userId, {
+        username: user.username,
+        isAdmin: user.isAdmin,
+      })
+      .then((response) => {
+        this.setState({ loading: true }); //To update data
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Made changes in database.",
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        store.addNotification({
+          ...this.notification,
+          title: "Error!",
+          message: error,
+          type: "danger",
+        });
       });
-    }).catch(error => {
-      console.log(error);
-      store.addNotification({
-        ...this.notification,
-        title: "Error!",
-        message: error,
-        type: "danger"
-      });
-    });
-
-  }
+  };
 
   showModal = (name) => {
     var modal = document.getElementById(name);
     modal.style.display = "block";
-  }
+  };
 
   hideModal = (name) => {
     var modal = document.getElementById(name);
     modal.style.display = "none";
-  }
+  };
 
   async getUsersData() {
     const res = await axios.get("http://localhost:8002/users");
@@ -131,7 +145,7 @@ class UserList extends React.Component {
       if (event.target == deleteModal) {
         editModal.style.display = "none";
       }
-    }
+    };
 
     if (this.state.loading) this.getUsersData();
     const columns = [
@@ -151,20 +165,20 @@ class UserList extends React.Component {
         accessor: "[buttons]",
         Cell: (cellObj) => (
           <>
-          <button
-            type="button"
-            class="btn btn-primary mr-4"
-            onClick={() => this.editUser(cellObj.row)}
-          >
-            Edit
-          </button>
-          <button 
-            type="button"
-            class="btn btn-primary"
-            onClick={() => this.deleteUser(cellObj.row)}
-          >
-            Delete
-          </button>
+            <button
+              type="button"
+              class="btn btn-primary mr-4"
+              onClick={() => this.editUser(cellObj.row)}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onClick={() => this.deleteUser(cellObj.row)}
+            >
+              Delete
+            </button>
           </>
         ),
       },
@@ -175,39 +189,70 @@ class UserList extends React.Component {
         <Table columns={columns} data={this.state.users} />
         <div id="editModal" class="modal">
           <div class="modal-content">
-            <span class="close" onClick={() => this.hideModal("editModal")}>&times;</span>
+            <span
+              style={{ color: "#35393c" }}
+              class="close"
+              onClick={() => this.hideModal("editModal")}
+            >
+              &times;
+            </span>
             <h3>Edit user:</h3>
-            <p id="username">Username: </p>
-            <p id="name">Name: </p>
-            <label htmlFor="normal-switch">
-              <span>Administrator</span>
-              <Switch
-                onChange={this.handleChange}
-                checked={this.state.checked}
-                id="normal-switch"
-              />
-            </label>
-            <button
-              type="button"
-              class="btn btn-primary"
+            <div className="modal-element">
+              <TextField
+                variant="outlined"
+                disabled
+                label="Username"
+                id="username"
+              ></TextField>
+            </div>
+            <div className="modal-element">
+              <TextField variant="outlined" disabled label="Name" id="name"></TextField>
+            </div>
+            <div className="modal-element">
+            <FormControlLabel
+              label="Administrator"
+              style={{marginLeft:"5px"}}
+              control={
+                <Switch
+                  onChange={this.handleChange}
+                  checked={this.state.checked}
+                  id="normal-switch"
+                />
+              }
+            ></FormControlLabel>
+            </div>
+            <PrimaryButton
               onClick={() => this.saveChanges()}
-            >Submit</button>
+            >
+              Submit
+            </PrimaryButton>
           </div>
         </div>
         <div id="deleteModal" class="modal">
           <div class="modal-content">
-            <span class="close" onClick={() => this.hideModal("deleteModal")}>&times;</span>
+            <span class="close" onClick={() => this.hideModal("deleteModal")}>
+              &times;
+            </span>
             <h3>Are you sure you want to delete user?</h3>
-            <p id="usernameDelete">Username: </p>
-            <p id="nameDelete">Name: </p>
-            <button
-              type="button"
-              class="btn btn-primary btn-danger"
+             <div className="modal-element">
+              <TextField
+                variant="outlined"
+                disabled
+                label="Username"
+                id="usernameDelete"
+              ></TextField>
+            </div>
+            <div className="modal-element">
+              <TextField variant="outlined" disabled label="Name" id="nameDelete"></TextField>
+            </div>
+            <DangerButton
               onClick={() => this.submitDelete()}
-            >Yes</button>
+            >
+              Yes
+            </DangerButton>
           </div>
         </div>
-      </div >
+      </div>
     );
   }
 }

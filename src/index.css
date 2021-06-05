@@ -128,11 +128,20 @@ code {
 
 /* Modal Content */
 .modal-content {
-  background-color: #006fa3;
+  background-color: #7bb2d9;
+  color:#35393C;
   margin: auto;
   padding: 2%;
   border: 1px solid #888;
   width: 40%;
+}
+
+.modal-element{
+  padding-top: 1rem;
+}
+
+.priority-icon-filled{
+  color: #ffd400;
 }
 
 .modal-content button{

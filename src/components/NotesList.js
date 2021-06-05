@@ -30,11 +30,17 @@ class NotesList extends Component {
   render() {
     const { isLoading, notesList } = this.state;
 
+
     if (isLoading) {
       return <div>Loading...</div>;
     }
 
-    return (
+    if(notesList.length===0){
+      return(<div className="NotesList">
+        <h3>No notes to view</h3>
+      </div>)
+    }else{
+      return (
         <div className="NotesList">
           {notesList.map((note,key) => {
            return (<Note 
@@ -45,6 +51,7 @@ class NotesList extends Component {
           })}
         </div>
     );
+    }
   }
 
 }

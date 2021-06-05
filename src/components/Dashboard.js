@@ -8,7 +8,6 @@ function Dashboard(props) {
   return (
     <div>
       <WeeklyCalendar></WeeklyCalendar>
-      Welcome {user.name}!<br /><br />
     </div>
   );
 }
