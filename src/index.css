@@ -43,13 +43,17 @@ code {
 
 #centered {
   margin: 0;
+  color: white !important;
   width: 20%;
+  padding: 2rem;
   position: absolute;
   top: 50%;
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
+/* POPUPS */
 
 .popup {
   position: fixed;
@@ -94,14 +98,15 @@ code {
   top: 20%;
 }
 
+/*Notes List*/
+
 .NotesList{
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-
-
+/* Calendar Buttons */
 .fc .fc-button-primary{
   color: #fff;
   color: var(--fc-button-text-color, #fff);
@@ -111,7 +116,7 @@ code {
   border-color: var(--fc-button-border-color, #070707);
 }
 
-
+/*Modal windows */
 .modal {
   display: none; 
   position: fixed; 
@@ -128,11 +133,20 @@ code {
 
 /* Modal Content */
 .modal-content {
-  background-color: #006fa3;
+  background-color: #7bb2d9;
+  color:#35393C;
   margin: auto;
   padding: 2%;
   border: 1px solid #888;
   width: 40%;
+}
+
+.modal-element{
+  padding-top: 1rem;
+}
+
+.priority-icon-filled{
+  color: #ffd400;
 }
 
 .modal-content button{
@@ -150,7 +164,82 @@ code {
 
 .close:hover,
 .close:focus {
-  color: #000;
+  color: #ac3931;
   text-decoration: none;
   cursor: pointer;
+}
+
+/*Notes*/
+
+.note-container{
+  display: flex;
+  flex-direction: column;
+}
+
+
+.note-container #body{
+  margin-bottom: 1rem;
+  border: .3rem dotted rgba(0, 0, 0, 0.3);
+  padding: .4rem;
+}
+
+
+/*User edit panel*/
+
+.edit-panel{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.user-edit-forms-header{
+  width: 45.5rem;
+  text-align: center;
+  height: 2rem;
+  padding: 2rem;
+}
+
+#user-edit-field {
+  margin: .5rem;
+  padding: .5rem;
+}
+
+.user-edit-forms{
+  display: flex;
+  flex-direction: row;
+}
+
+.user-edit-form{
+  height: 150%;
+  margin: 2rem;
+  padding: .5rem
+}
+
+/* Login Panel*/
+
+.login-panel{
+  display: flex;
+  border-radius: .3rem;
+  flex-direction: column;
+  background-color: #7bb2d9 ;
+}
+
+.login-form-header{
+  text-align: center;
+  margin-bottom: .3rem;
+}
+
+.credentials-input{
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.login-form-button{
+  display: flex;
+  margin-bottom: 1rem;
+  flex-direction: row;
+  justify-content: center;
 }
