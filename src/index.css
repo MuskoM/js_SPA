@@ -43,7 +43,10 @@ code {
 
 #centered {
   margin: 0;
+  color: white !important;
   width: 20%;
+  padding: 2rem;
+  background-color: #7bb2d9;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -162,4 +165,22 @@ code {
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+.note-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.note-container #body{
+  margin-bottom: 1rem;
+  border: .3rem dotted rgba(0, 0, 0, 0.3);
+  padding: .4rem;
+}
+
+#user-edit-field {
+
+  margin: .5rem;
+  padding: .5rem;
+
 }

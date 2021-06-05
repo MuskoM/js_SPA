@@ -5,7 +5,7 @@ import axios from "axios";
 import interactionPlugin from "@fullcalendar/interaction";
 import React from "react";
 import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
-import PrimaryButton from './Buttons/PrimaryButton'
+import {PrimaryButton,SecondaryButton} from './Buttons'
 import EventPopup from "./EventPopup";
 import PropTypes from 'prop-types';
 import {
@@ -20,29 +20,6 @@ import {
 } from "@material-ui/core";
 import { store } from "react-notifications-component";
 
-const priorityIcons = {
-    1:{
-        icon:<PriorityHigh/>,
-        label: "Low"
-    },
-    2:{
-        icon:<PriorityHigh/>,
-        label: "Medium"
-    },
-    3:{
-        icon:<PriorityHigh/>,
-        label: "High"
-    }
-}
-
-function IconContainer(props) {
-    const { value, ...other } = props;
-    return <span {...other}>{priorityIcons[value].icon}</span>;
-  }
-  
-  IconContainer.propTypes = {
-    value: PropTypes.number.isRequired,
-  };
 
 class DayGridCalendar extends React.Component {}
 
@@ -141,36 +118,35 @@ class WeeklyCalendar extends React.Component {
             }}
               ></TextField>
             </div>
-            <div className="modal-element">
+            <div className="modal-element" style={{border:' 0.5px solid rgba(0,0,0,.2)',borderRadius:".3rem",marginTop:'1rem',marginBottom:'1rem',paddingLeft:"0.5rem",width:"30%"}}>
                 <label>Priority</label><br></br>
               <Rating
               id="prioritySelector" 
               max={3}
               classes={{iconFilled:"priority-icon-filled"}}
               defaultValue={2}
-              getLabelText={(value)=>priorityIcons[value].label}
-              IconContainerComponent={IconContainer}
               name="priority"
+              icon={<PriorityHigh fontSize="inherit"/>}
               onChange={(e)=>{
                 this.setState({priority:e.target.value})
             }}></Rating>
             </div>
-            <PrimaryButton
+            <div style={{paddingBottom:'1rem'}}>
+            <PrimaryButton onClick={this.submitEventData}>
+                Submit
+            </PrimaryButton>
+            </div>
+            <div>
+            <SecondaryButton
               onClick={() => {
                 this.hideModal("addEventModal");
               }}
             >
               Close
-            </PrimaryButton>
-            <PrimaryButton onClick={()=>{console.log(this.state)}}>
-                TEEST
-            </PrimaryButton>
-            <PrimaryButton onClick={this.submitEventData}>
-                Submit
-            </PrimaryButton>
+            </SecondaryButton>
+            </div>
           </div>
         </div>
-        
       </div>
     );
   }

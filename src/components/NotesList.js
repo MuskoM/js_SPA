@@ -1,9 +1,6 @@
 import axios from "axios";
 import { React, Component } from "react";
-import { Accordion, Button, Paper } from "@material-ui/core";
 import Note from "./Note";
-import makeStyles from '@material-ui/core/styles/makeStyles'
-import useStyles from '../utils/styles'
 
 class NotesList extends Component {
   constructor(props) {
@@ -44,7 +41,9 @@ class NotesList extends Component {
         <div className="NotesList">
           {notesList.map((note,key) => {
            return (<Note 
-            text={note.title}
+            title={note.title}
+            body={note.noteBody}
+            priority={note.priority}
             dataOd={note.start}
             dataDo={note.end}
             ></Note>)

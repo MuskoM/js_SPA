@@ -4,7 +4,7 @@ import Table from "./Table";
 import Switch from "react-switch";
 import { store } from "react-notifications-component";
 import { FormControlLabel, TextField } from "@material-ui/core";
-import {PrimaryButton,DangerButton} from "./Buttons/PrimaryButton";
+import {PrimaryButton,SecondaryButton} from "./Buttons";
 
 class UserList extends React.Component {
   constructor(props) {
@@ -245,11 +245,11 @@ class UserList extends React.Component {
             <div className="modal-element">
               <TextField variant="outlined" disabled label="Name" id="nameDelete"></TextField>
             </div>
-            <DangerButton
+            <SecondaryButton
               onClick={() => this.submitDelete()}
             >
               Yes
-            </DangerButton>
+            </SecondaryButton>
           </div>
         </div>
       </div>
