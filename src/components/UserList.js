@@ -58,9 +58,6 @@ class UserList extends React.Component {
     this.setState({ checked: checked });
   };
 
-  handleTextInput = (evt) =>{
-
-  }
 
   submitDelete = () => {
     var modal = document.getElementById("deleteModal");

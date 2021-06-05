@@ -140,173 +140,125 @@ function EditUser(props) {
   };
   var user = JSON.parse(sessionStorage.user);
 
-
-  console.log(user)
+  console.log(user);
 
   return (
-    <Paper id="centered">
-      <h3>User Edit</h3>
-      <div>
-        <div id="user-edit-field">
-          <TextField
-            id="user-edit-field"
-            placeholder={user.name}
-            autoComplete="new-password"
-            variant="outlined"
-            onKeyDown={handleEnterButton}
-            label="First Name"
-            {...firstname}
-          ></TextField>
-        </div>
-        <div id="user-edit-field">
-          <TextField
-            id="user-edit-field"
-            placeholder={user.lastname}
-            variant="outlined"
-            autoComplete="new-password"
-            onKeyDown={handleEnterButton}
-            label="Last Name"
-            {...lastname}
-          ></TextField>
-        </div>
-        <div id="user-edit-field">
-          <PrimaryButton
-            value={loading ? "Loading..." : "Submit"}
-            onClick={handleUpdate}
-            disabled={loading}
+    <div className="edit-panel">
+      <div className="user-edit-forms-header">
+        <Paper style={{ backgroundColor: "#ffd400", padding: ".5rem" }}>
+          <h3>User Panel</h3>
+        </Paper>
+      </div>
+      <div className="user-edit-forms">
+        <div className="user-edit-form">
+          <Paper
+            style={{
+              backgroundColor: "#ffd400",
+              textAlign: "center",
+              padding: ".3rem",
+              marginBottom: ".3rem",
+            }}
           >
-            Submit
-          </PrimaryButton>
-        </div>
-        <div id="user-edit-field">
-          <TextField
-            id="user-edit-field"
-            variant="outlined"
-            {...oldPassword}
-            onKeyDown={handleEnterButton}
-            label="Old Password"
-          ></TextField>
-        </div>
-        <div id="user-edit-field">
-          <TextField
-            id="user-edit-field"
-            variant="outlined"
-            onKeyDown={handleEnterButton}
-            label="New Password"
-            {...password}
-          ></TextField>
-        </div>
-        <div id="user-edit-field">
-          <TextField
-            id="user-edit-field"
-            variant="outlined"
-            onKeyDown={handleEnterButton}
-            label="Confirm Password"
-            {...confirmPassword}
-          ></TextField>
-        </div>
-        <div id="user-edit-field">
-          <PrimaryButton
-            value={loading ? "Loading..." : "Submit"}
-            onClick={handleCredentialsUpdate}
-            disabled={loading}
+            <h3>Edit Details</h3>
+          </Paper>
+          <Paper
+            style={{
+              backgroundColor: "#7bb2d9",
+              textAlign: "center",
+              padding: "1rem",
+            }}
           >
-            Submit
-          </PrimaryButton>
+            <div id="user-edit-field">
+              <TextField
+                id="user-edit-field"
+                placeholder={user.name}
+                autoComplete="new-password"
+                variant="outlined"
+                onKeyDown={handleEnterButton}
+                label="First Name"
+                {...firstname}
+              ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField
+                id="user-edit-field"
+                placeholder={user.lastname}
+                variant="outlined"
+                autoComplete="new-password"
+                onKeyDown={handleEnterButton}
+                label="Last Name"
+                {...lastname}
+              ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <PrimaryButton
+                value={loading ? "Loading..." : "Submit"}
+                onClick={handleUpdate}
+                disabled={loading}
+              >
+                Submit
+              </PrimaryButton>
+            </div>
+          </Paper>
+        </div>
+        <div className="user-edit-form">
+          <Paper
+            style={{
+              backgroundColor: "#ffd400",
+              textAlign: "center",
+              padding: ".3rem",
+              marginBottom: ".3rem",
+            }}
+          >
+            <h3>Change Password</h3>
+          </Paper>
+          <Paper
+            style={{
+              backgroundColor: "#7bb2d9",
+              textAlign: "center",
+              padding: "1rem",
+            }}
+          >
+            <div id="user-edit-field">
+              <TextField
+                id="user-edit-field"
+                variant="outlined"
+                {...oldPassword}
+                onKeyDown={handleEnterButton}
+                label="Old Password"
+              ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField
+                id="user-edit-field"
+                variant="outlined"
+                onKeyDown={handleEnterButton}
+                label="New Password"
+                {...password}
+              ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField
+                id="user-edit-field"
+                variant="outlined"
+                onKeyDown={handleEnterButton}
+                label="Confirm Password"
+                {...confirmPassword}
+              ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <PrimaryButton
+                value={loading ? "Loading..." : "Submit"}
+                onClick={handleCredentialsUpdate}
+                disabled={loading}
+              >
+                Submit
+              </PrimaryButton>
+            </div>
+          </Paper>
         </div>
       </div>
-      {/* <div>
-        Firstname
-        <br />
-        <input
-          type="text"
-          {...firstname}
-          placeholder={user.name}
-          autoComplete="new-password"
-          class="form-control"
-          onKeyDown={handleEnterButton}
-          minLength="1"
-          maxLength="20"
-        />
-      </div>
-      <div>
-        Lastname
-        <br />
-        <input
-          type="text"
-          {...lastname}
-          placeholder={user.lastname}
-          autoComplete="new-password"
-          class="form-control"
-          onKeyDown={handleEnterButton}
-          minLength="1"
-          maxLength="20"
-        />
-      </div>
-      <input
-        type="button"
-        class="btn btn-primary"
-        value={loading ? "Loading..." : "Submit"}
-        onClick={handleUpdate}
-        disabled={loading}
-      />
-      <br />
-
-      <div style={{ marginTop: 10 }}>
-        Old Password
-        <br />
-        <input
-          type="password"
-          {...oldPassword}
-          autoComplete="new-password"
-          class="form-control"
-          onKeyDown={handleEnterButton}
-          minLength="1"
-          maxLength="20"
-        />
-      </div>
-      <div style={{ marginTop: 10 }}>
-        Password
-        <br />
-        <input
-          type="password"
-          {...password}
-          autoComplete="new-password"
-          class="form-control"
-          onKeyDown={handleEnterButton}
-          minLength="1"
-          maxLength="20"
-        />
-      </div>
-      <div style={{ marginTop: 10 }}>
-        Confirm Password
-        <br />
-        <input
-          type="password"
-          {...confirmPassword}
-          autoComplete="new-password"
-          class="form-control"
-          onKeyDown={handleEnterButton}
-          minLength="1"
-          maxLength="20"
-        />
-      </div>
-      <input
-        type="button"
-        class="btn btn-primary"
-        value={loading ? "Loading..." : "Submit"}
-        onClick={handleCredentialsUpdate}
-        disabled={loading}
-      /> */}
-      <br />
-
-      {/* {error && (
-        <>
-          <small style={{ color: "red" }}>{error}</small>
-          <br />
-        </>
-      )} */}
-    </Paper>
+    </div>
   );
 }
 

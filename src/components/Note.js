@@ -8,6 +8,23 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
+import PrimaryButton, { SecondaryButton } from "./Buttons";
+import axios from "axios";
+import { store } from "react-notifications-component";
+
+let notification = {
+  title: "Test notification",
+  message: "You shouldn't see it here.",
+  type: "success",
+  insert: "bottom",
+  container: "bottom-right",
+  animationIn: ["animate__animated", "animate__fadeIn"],
+  animationOut: ["animate__animated", "animate__fadeOut"],
+  dismiss: {
+    duration: 5000,
+    onScreen: true,
+  },
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,6 +64,24 @@ let Note = (props) => {
     setExpanded(isExpanded ? panel : false);
   };
 
+  let deleteNote = (id) =>{
+
+    axios.delete('http://localhost:8002/notes/'+id).then(
+      (resp)=>{store.addNotification({
+        notification,
+        title: "Success!",
+        message: "Succesfully deleted a note.",
+        type: "success",
+      });
+    }
+  ).catch((err)=>{
+    console.log("Can't delete a note",err)
+  })
+  
+  }
+
+  let id = props.id;
+
   return (
     <Accordion
       className={classes.root}
@@ -58,9 +93,8 @@ let Note = (props) => {
         aria-controls="panel1bh-content"
         id="panel1bh-header"
       >
-        <Typography className={classes.heading}>{props.title}</Typography>
+        <Typography className={classes.heading}>{props.title} {props.id}</Typography>
         <Typography className={classes.secondaryHeading}>
-          {" "}
           Od: {dataOd},{godzOd} Do: {dataDo},{godzDo}{" "}
         </Typography>
       </AccordionSummary>
@@ -68,17 +102,19 @@ let Note = (props) => {
         <div id="body">
           <Typography>{props.body}</Typography>
         </div>
-        <div id="notePriority">
-          <Typography>
-            Priorytet
+        <div id="notePriority"style={{alignSelf:"flex-end"}}>
             <StyledRating
             name="priority"
             value={props.priority}
             readOnly
             icon={<PriorityHigh fontSize="inherit"/>}
-            max={3}>
+            max={3}
+            >
             </StyledRating>
-          </Typography>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between"}}>
+        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Edit</PrimaryButton>
+        <SecondaryButton onClick={()=>deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
         </div>
       </AccordionDetails>
     </Accordion>

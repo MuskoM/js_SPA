@@ -7,7 +7,6 @@ import React from "react";
 import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
 import {PrimaryButton,SecondaryButton} from './Buttons'
 import EventPopup from "./EventPopup";
-import PropTypes from 'prop-types';
 import {
   Button,
   Dialog,
