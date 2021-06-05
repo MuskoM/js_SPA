@@ -90,8 +90,8 @@ app.post("/notes", (req, res) => {
         let newNote = req.body;
         let noNotes = data.Notes.length;
         console.log(noNotes)
-        if(noNotes > 0)
-            newNote.id = noNotes+1
+        if (noNotes > 0)
+            newNote.id = noNotes + 1
         else
             newNote.id = 1
         console.log(newNote)
@@ -260,7 +260,15 @@ app.post("/categories", (req, res) => {
                 .send(`Category with id = ${req.body.id} already exists`);
             return;
         }
-        data.Categories.push(req.body);
+        var categories = data.Categories;
+        categories.sort((a, b) => {
+            return a.id > b.id;
+        })
+        var newCategory = req.body;
+        if (categories.length > 0)
+            newCategory.id = categories[categories.length - 1].id + 1;
+        else newCategory.id = 1;
+        data.Categories.push(newCategory);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
@@ -311,6 +319,7 @@ app.put("/categories/:id", (req, res) => {
             });
         } else {
             var idx = data.Categories.findIndex((n) => n.id == req.params.id);
+            req.body.id = req.params.id;
             data.Categories[idx] = req.body;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
@@ -410,15 +419,15 @@ app.post("/users", (req, res) => {
         var savedUser = data.Users.find((u) => u.username == req.body.username);
         if (savedUser) {
             console.log(`Username = ${req.body.username} already in use`);
-            return res.status(500).json({error: true, message: `Username = ${req.body.username} already in use`, errorKey: 'usernameOccupied'});
+            return res.status(500).json({ error: true, message: `Username = ${req.body.username} already in use`, errorKey: 'usernameOccupied' });
         }
         var users = data.Users;
-        users.sort((a,b) => {
+        users.sort((a, b) => {
             return a.id > b.id;
         })
         var newUser = req.body;
         if (users.length > 0)
-            newUser.id = users[users.length-1].id + 1;
+            newUser.id = users[users.length - 1].id + 1;
         else newUser.id = 1;
         if (newUser.isAdmin == undefined) newUser.isAdmin = false;
         data.Users.push(newUser);
@@ -426,7 +435,7 @@ app.post("/users", (req, res) => {
         fs.writeFile(file_path, newList, (err) => {
             if (err) {
                 console.log(`Error writing file in POST /users: ${err}`);
-                return res.status(500).json({error: true, message: `Error writing file data.json`, errorKey: "defaultError"});
+                return res.status(500).json({ error: true, message: `Error writing file data.json`, errorKey: "defaultError" });
             } else {
                 console.log(`Successfully wrote file with data and added new user with id = ${newUser.id}`);
                 return res.status(201).json(utils.getCleanUser(newUser));
@@ -455,8 +464,10 @@ app.put("/users/:id", (req, res) => {
         }
         var user = data.Users.find((u) => u.id == req.params.id);
         if (!user) {
+            var data = JSON.parse(dataJson);
             data.Users.push(req.body);
             var newList = JSON.stringify(data);
+
             fs.writeFile(file_path, newList, (err) => {
                 if (err) {
                     console.log(
@@ -472,13 +483,13 @@ app.put("/users/:id", (req, res) => {
             });
         } else {
             if (req.body.oldPassword != null) {
-                if (user.password !== req.body.oldPassword){
+                if (user.password !== req.body.oldPassword) {
                     console.log('Invalid old password');
-                    return res.status(500).json({errorKey: `wrongPassword`});
+                    return res.status(500).json({ errorKey: `wrongPassword` });
                 }
-                if (user.password === req.body.password){
+                if (user.password === req.body.password) {
                     console.log(`Password already used`);
-                    return res.status(500).json({errorKey: `alreadyUsedPassword`});
+                    return res.status(500).json({ errorKey: `alreadyUsedPassword` });
                 }
             }
             var editedUser = {
@@ -557,11 +568,11 @@ app.post('/users/signin', function (req, res) {
     var userData = storage.findUserByUsername(user);
 
     if (!userData) {
-        return res.status(401).json({error: true, message: `User not found`, errorKey: `userNotFound`});
+        return res.status(401).json({ error: true, message: `User not found`, errorKey: `userNotFound` });
     }
 
     if (user !== userData.username || pwd !== userData.password) {
-        return res.status(401).json({error: true, message: `Invalid credentials`, errorKey: `invalidCredentials`});
+        return res.status(401).json({ error: true, message: `Invalid credentials`, errorKey: `invalidCredentials` });
     }
 
     const token = utils.generateToken(userData);
@@ -574,7 +585,7 @@ app.post('/users/signin', function (req, res) {
 app.get('/verifyToken', function (req, res) {
     var token = req.query.token;
     if (!token) {
-        return res.status(400).json({error: true,message: `Token is required.`, errorKey: `tokenError`});
+        return res.status(400).json({ error: true, message: `Token is required.`, errorKey: `tokenError` });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
