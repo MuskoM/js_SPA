@@ -1,9 +1,11 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import interactionPlugin from "@fullcalendar/interaction";
 import React from "react";
+import {getWeek} from 'date-fns'
 import {PriorityHigh} from '@material-ui/icons'
 // import {LocalConvenienceStoreOutlined } from '@material-ui/icons'
 import {PrimaryButton,SecondaryButton} from './Buttons'
@@ -44,8 +46,9 @@ class WeeklyCalendar extends React.Component {
     return (
       <div>
         <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          timeZone='Europe/Warsaw'
+          plugins={[timeGridPlugin,dayGridPlugin, interactionPlugin]}
+          initialView="timeGridWeek"
           eventSources={[
             {
               id: 1,
@@ -55,9 +58,21 @@ class WeeklyCalendar extends React.Component {
               method: "GET",
             },
           ]}
-          height={window.innerHeight - 250}
+          height={window.innerHeight - 100}
           aspectRatio={0.5}
+          firstDay={1}
+          weekNumbers
+          weekNumberCalculation={(date)=>{return getWeek(date)%2 ? 2 : 1}}
           selectable={true}
+          slotDuration='01:00:00'
+          slotMinTime='07:00:00'
+          expandRows
+          slotMaxTime='23:00:00'
+          headerToolbar={{
+            start: 'title',
+            center: 'dayGridMonth,timeGridWeek,timeGridDay',
+            end:"today,prev,next"
+          }}
           select={this.addEvent}
         />
         <div className="modal" id="addEventModal">
@@ -71,7 +86,7 @@ class WeeklyCalendar extends React.Component {
                 defaultValue="2017-05-24T10:30"
                 type="datetime-local"
                 onChange={(e)=>{
-                    this.setState({dataOd:e.target.value})
+                    this.setState({start:e.target.value})
                 }}
               ></TextField>
             </div>
@@ -83,7 +98,7 @@ class WeeklyCalendar extends React.Component {
                 defaultValue="2017-05-24T10:30"
                 type="datetime-local"
                 onChange={(e)=>{
-                    this.setState({dataDo:e.target.value})
+                    this.setState({end:e.target.value})
                 }}
               ></TextField>
             </div>
