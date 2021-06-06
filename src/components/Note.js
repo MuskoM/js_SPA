@@ -1,6 +1,7 @@
 import { Accordion } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
-import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
+import {PriorityHigh} from '@material-ui/icons'
+// import {LocalConvenienceStoreOutlined} from '@material-ui/icons'
 import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -58,6 +59,8 @@ let Note = (props) => {
   let godzOd = new Date(props.dataOd).toLocaleTimeString();
   let godzDo = new Date(props.dataOd).toLocaleTimeString();
   const [expanded, setExpanded] = React.useState(false);
+  
+  // eslint-disable-next-line no-unused-vars
   const [value, setValue] = React.useState(2);
 
   const handleChange = (panel) => (event, isExpanded) => {

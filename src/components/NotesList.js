@@ -8,14 +8,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import EventPopup from "./EventPopup";
 import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
   TextField,
-  DialogActions,
-  TextareaAutosize,
 } from "@material-ui/core";
 import { store } from "react-notifications-component";
 

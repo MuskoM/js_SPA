@@ -12,10 +12,10 @@ function Register(props) {
   const [error, setError] = useState(null);
 
   const handleRegister = () => {
-    let userId;
+    // let userId;
     setError(null);
     setLoading(true);
-    if (confirmPassword.value != password.value) {
+    if (confirmPassword.value !== password.value) {
       setError("Passwords don't match");
       return;
     }

@@ -136,10 +136,10 @@ class UserList extends React.Component {
     var deleteModal = document.getElementById("deleteModal");
 
     window.onclick = function (event) {
-      if (event.target == editModal) {
+      if (event.target === editModal) {
         editModal.style.display = "none";
       }
-      if (event.target == deleteModal) {
+      if (event.target === deleteModal) {
         editModal.style.display = "none";
       }
     };

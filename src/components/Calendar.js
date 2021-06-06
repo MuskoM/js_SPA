@@ -4,19 +4,11 @@ import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import interactionPlugin from "@fullcalendar/interaction";
 import React from "react";
-import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
+import {PriorityHigh} from '@material-ui/icons'
+// import {LocalConvenienceStoreOutlined } from '@material-ui/icons'
 import {PrimaryButton,SecondaryButton} from './Buttons'
 import EventPopup from "./EventPopup";
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  TextField,
-  DialogActions,
-  TextareaAutosize,
-} from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { store } from "react-notifications-component";
 
 

@@ -11,6 +11,7 @@ function EditUser(props) {
   const lastname = useFormInput("");
   const confirmPassword = useFormInput("");
   const oldPassword = useFormInput("");
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const notification = {
     title: "Test notification",
@@ -29,7 +30,7 @@ function EditUser(props) {
   const handleUpdate = () => {
     setError(null);
     setLoading(true);
-    if (firstname.value == undefined || lastname.value == undefined) {
+    if (firstname.value === undefined || lastname.value === undefined) {
       setLoading(false);
       setError("Name cannot be empty");
       store.addNotification({
@@ -71,7 +72,7 @@ function EditUser(props) {
   const handleCredentialsUpdate = () => {
     setError(null);
     setLoading(true);
-    if (confirmPassword.value != password.value) {
+    if (confirmPassword.value !== password.value) {
       setError("Passwords don't match");
       store.addNotification({
         ...notification,

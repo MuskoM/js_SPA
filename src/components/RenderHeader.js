@@ -1,5 +1,9 @@
+
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
+// eslint-disable-next-line no-unused-vars
 import makeStyles from '@material-ui/core/styles/makeStyles'
+// eslint-disable-next-line no-unused-vars
 import { getUser, getToken, getAdmin } from "../utils/Common";
 import { NavLink } from "react-router-dom";
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -26,7 +30,9 @@ const theme = createMuiTheme({
 
 
 function RenderHeader() {
-  const user = getUser();
+  // const user = getUser();
+
+  // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState();
 
   const refresh = () => {

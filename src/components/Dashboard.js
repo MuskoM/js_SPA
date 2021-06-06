@@ -1,9 +1,10 @@
 import React from 'react';
-import { getUser } from '../utils/Common';
-import {DayGridCalendar, WeeklyCalendar} from './Calendar'
+// import { getUser } from '../utils/Common';
+import {WeeklyCalendar} from './Calendar'
+// import {DayGridCalendar} from './Calendar'
 
 function Dashboard(props) {
-  const user = getUser();
+  // const user = getUser();
 
   return (
     <div>

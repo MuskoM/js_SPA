@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import Table from "./Table";
-import Switch from "react-switch";
+// import Switch from "react-switch";
 import { store } from 'react-notifications-component';
 
 class Categories extends React.Component {
@@ -42,12 +42,13 @@ class Categories extends React.Component {
 
     deleteCategory = (row) => {
         var category = row.values;
-        var id = category.id;
-        this.setState({ currentCategory: category });
+        this.setState({ ...this.state.currentCategory,
+            currentCategory: category });
         console.log(category);
         var name = document.getElementById("nameDelete");
         var description = document.getElementById("descriptionDelete");
-        name.innerHTML = `Name: ${category.name}`;
+        console.log(name);
+        name.innerHTML = 'Name: ' + category.name;
         description.innerHTML = `Description: ${category.description}`;
 
         this.showCategoryModal("deleteCategoryModal");
@@ -146,10 +147,10 @@ class Categories extends React.Component {
         var deleteCategoryModal = document.getElementById("deleteCategoryModal");
 
         window.onclick = function (event) {
-            if (event.target == editCategoryModal) {
+            if (event.target === editCategoryModal) {
                 editCategoryModal.style.display = "none";
             }
-            if (event.target == deleteCategoryModal) {
+            if (event.target === deleteCategoryModal) {
                 editCategoryModal.style.display = "none";
             }
         }
