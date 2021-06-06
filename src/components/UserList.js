@@ -79,7 +79,7 @@ class UserList extends React.Component {
         store.addNotification({
           ...this.notification,
           title: "Error!",
-          message: error,
+          message: error.message,
           type: "danger",
         });
       });
@@ -110,7 +110,7 @@ class UserList extends React.Component {
         store.addNotification({
           ...this.notification,
           title: "Error!",
-          message: error,
+          message: error.message,
           type: "danger",
         });
       });

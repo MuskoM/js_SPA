@@ -3,7 +3,8 @@ import axios from "axios";
 import Table from "./Table";
 // import Switch from "react-switch";
 import { store } from 'react-notifications-component';
-
+import { FormControlLabel, TextField } from "@material-ui/core";
+import { PrimaryButton, SecondaryButton } from "./Buttons";
 class Categories extends React.Component {
     constructor(props) {
         super(props);
@@ -34,7 +35,10 @@ class Categories extends React.Component {
 
     editCategory = (row) => {
         var category = row.values;
-        console.log("ROW", category);
+        var name = document.getElementById("nameEdit");
+        var description = document.getElementById("descriptionEdit");
+        name.placeholder = category.name;
+        description.placeholder = category.description;
         this.setState({ currentCategory: category });
 
         this.showCategoryModal("editCategoryModal");
@@ -42,14 +46,11 @@ class Categories extends React.Component {
 
     deleteCategory = (row) => {
         var category = row.values;
-        this.setState({ ...this.state.currentCategory,
-            currentCategory: category });
-        console.log(category);
-        var name = document.getElementById("nameDelete");
+        var name = document.getElementById("categoryNameDelete");
         var description = document.getElementById("descriptionDelete");
-        console.log(name);
-        name.innerHTML = 'Name: ' + category.name;
-        description.innerHTML = `Description: ${category.description}`;
+        name.value = `${category.name}`;
+        description.value = `${category.description}`;
+        this.setState({ currentCategory: category });
 
         this.showCategoryModal("deleteCategoryModal");
     }
@@ -67,11 +68,10 @@ class Categories extends React.Component {
                 type: "success"
             });
         }).catch(error => {
-            console.log(error);
             store.addNotification({
                 ...this.notification,
                 title: "Error!",
-                message: error,
+                message: error.message,
                 type: "danger"
             });
         });
@@ -82,7 +82,7 @@ class Categories extends React.Component {
         modal.style.display = "none";
         var name = document.getElementById("nameEdit");
         var description = document.getElementById("descriptionEdit");
-        var category = {name: name.value, description: description.value};
+        var category = { name: name.value, description: description.value };
         axios.put('http://localhost:8002/categories/' + this.state.currentCategory.id, { name: category.name, description: category.description }).then(response => {
             this.setState({ loading: true });
             store.addNotification({
@@ -92,11 +92,13 @@ class Categories extends React.Component {
                 type: "success"
             });
         }).catch(error => {
-            console.log(error);
+            var err = 'Something gone wrong';
+            if (error.response.status == 409)
+                err = 'Name already in use';
             store.addNotification({
                 ...this.notification,
                 title: "Error!",
-                message: error,
+                message: err,
                 type: "danger"
             });
         });
@@ -107,7 +109,7 @@ class Categories extends React.Component {
         modal.style.display = "none";
         var name = document.getElementById("nameCreate");
         var description = document.getElementById("descriptionCreate");
-        var category = {name: name.value, description: description.value};
+        var category = { name: name.value, description: description.value };
         axios.post('http://localhost:8002/categories', { name: category.name, description: category.description }).then(response => {
             this.setState({ loading: true });
             store.addNotification({
@@ -117,11 +119,13 @@ class Categories extends React.Component {
                 type: "success"
             });
         }).catch(error => {
-            console.log(error);
+            var err = 'Something gone wrong';
+            if (error.response.status == 409)
+                err = 'Category already exists';
             store.addNotification({
                 ...this.notification,
                 title: "Error!",
-                message: error,
+                message: err,
                 type: "danger"
             });
         });
@@ -198,51 +202,39 @@ class Categories extends React.Component {
                     <div class="modal-content">
                         <span class="close" onClick={() => this.hideCategoryModal("editCategoryModal")}>&times;</span>
                         <h3>Edit category:</h3>
-                        <div>
-                            Name<br />
-                            <input type="text" id="nameEdit" autoComplete="new-password" class="form-control" />
+                        <div className="modal-element">
+                            <TextField variant="outlined" label="Name" id="nameEdit"></TextField>
                         </div>
-                        <div>
-                            Description<br />
-                            <input type="text" id="descriptionEdit" autoComplete="new-password" class="form-control" />
+                        <div className="modal-element">
+                            <TextField variant="outlined" label="Description" id="descriptionEdit"></TextField>
                         </div>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            onClick={() => this.saveChanges()}
-                        >Submit</button>
+                        <SecondaryButton onClick={() => this.saveChanges()}>Submit</SecondaryButton>
                     </div>
                 </div>
                 <div id="deleteCategoryModal" class="modal">
                     <div class="modal-content">
                         <span class="close" onClick={() => this.hideCategoryModal("deleteCategoryModal")}>&times;</span>
                         <h3>Are you sure you want to delete category?</h3>
-                        <p id="nameDelete">Name: </p>
-                        <p id="descriptionDelete">Description: </p>
-                        <button
-                            type="button"
-                            class="btn btn-primary btn-danger"
-                            onClick={() => this.submitDelete()}
-                        >Yes</button>
+                        <div className="modal-element">
+                            <TextField variant="outlined" disabled label="Name" id="categoryNameDelete"></TextField>
+                        </div>
+                        <div className="modal-element">
+                            <TextField variant="outlined" disabled label="Description" id="descriptionDelete"></TextField>
+                        </div>
+                        <SecondaryButton onClick={() => this.submitDelete()}>Yes</SecondaryButton>
                     </div>
                 </div>
                 <div id="createCategoryModal" class="modal">
                     <div class="modal-content">
                         <span class="close" onClick={() => this.hideCategoryModal("createCategoryModal")}>&times;</span>
                         <h3>Create category:</h3>
-                        <div>
-                            Name<br />
-                            <input type="text" id="nameCreate" class="form-control" />
+                        <div className="modal-element">
+                            <TextField variant="outlined" label="Name" id="nameCreate"></TextField>
                         </div>
-                        <div>
-                            Description<br />
-                            <input type="text" id="descriptionCreate" class="form-control" />
+                        <div className="modal-element">
+                            <TextField variant="outlined" label="Description" id="descriptionCreate"></TextField>
                         </div>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            onClick={() => this.saveCreate()}
-                        >Submit</button>
+                        <SecondaryButton onClick={() => this.saveCreate()}>Submit</SecondaryButton>
                     </div>
                 </div>
             </div >

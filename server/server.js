@@ -252,13 +252,13 @@ app.post("/categories", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var category = data.Categories.find((c) => c.id == req.body.id);
+        var category = data.Categories.find((c) => c.id == req.body.id || c.name == req.body.name);
         if (category) {
             console.log(`Category with id = ${req.body.id} already exists`);
-            res
-                .status(500)
+            return res
+                .status(409)
                 .send(`Category with id = ${req.body.id} already exists`);
-            return;
+            
         }
         var categories = data.Categories;
         categories.sort((a, b) => {
@@ -300,7 +300,7 @@ app.put("/categories/:id", (req, res) => {
                 .send(`Category with id = ${categoryBody.id} already exists`);
             return;
         }
-        var category = data.Categories.find((c) => c.id == req.params.id);
+        var category = data.Categories.find((c) => c.id == req.params.id || c.name == req.body.name);
         if (!category) {
             data.Categories.push(req.body);
             var newList = JSON.stringify(data);
@@ -318,6 +318,11 @@ app.put("/categories/:id", (req, res) => {
                 }
             });
         } else {
+            if (category.id != req.params.id) {
+                return res
+                .status(409)
+                .send(`Category with id = ${req.body.id} already exists`);
+            }
             var idx = data.Categories.findIndex((n) => n.id == req.params.id);
             req.body.id = req.params.id;
             data.Categories[idx] = req.body;

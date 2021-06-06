@@ -226,6 +226,7 @@ function EditUser(props) {
                 variant="outlined"
                 {...oldPassword}
                 onKeyDown={handleEnterButton}
+                type="password"
                 label="Old Password"
               ></TextField>
             </div>
@@ -235,6 +236,7 @@ function EditUser(props) {
                 variant="outlined"
                 onKeyDown={handleEnterButton}
                 label="New Password"
+                type="password"
                 {...password}
               ></TextField>
             </div>
@@ -244,6 +246,7 @@ function EditUser(props) {
                 variant="outlined"
                 onKeyDown={handleEnterButton}
                 label="Confirm Password"
+                type="password"
                 {...confirmPassword}
               ></TextField>
             </div>
