@@ -13,7 +13,7 @@ import EventPopup from "./EventPopup";
 import { Select, TextField, MenuItem } from "@material-ui/core";
 import { store } from "react-notifications-component";
 
-class DayGridCalendar extends React.Component {}
+class DayGridCalendar extends React.Component { }
 
 class WeeklyCalendar extends React.Component {
   constructor(props) {
@@ -45,7 +45,7 @@ class WeeklyCalendar extends React.Component {
   };
 
   render() {
-    
+
     const { isLoading, categories } = this.state;
 
     if (isLoading) {
@@ -166,13 +166,13 @@ class WeeklyCalendar extends React.Component {
                 ></Rating>
               </div>
               <div className="modal-element">
-                <TextField label="Kategoria" value={categories[0].id} variant="outlined" select onChange={(e)=>{
-                  this.setState({selectedCategory:e.target.value})
+                <TextField label="Kategoria" value={this.state.selectedCategory} variant="outlined" select onChange={(e) => {
+                  this.setState({ selectedCategory: e.target.value })
                 }}>
-                  {categories.map((option,i)=>{
-                  return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem> )
+                  {categories.map((option, i) => {
+                    return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>)
                   })}
-                  
+
                 </TextField>
               </div>
             </div>
@@ -208,7 +208,7 @@ class WeeklyCalendar extends React.Component {
     axios
       .get("http://localhost:8002/categories")
       .then((resp) => {
-        this.setState({ categories: resp.data });
+        this.setState({ categories: resp.data, selectedCategory: resp.data[0].id });
         this.setState({ isLoading: false });
       })
       .catch((err) => {
@@ -227,13 +227,16 @@ class WeeklyCalendar extends React.Component {
   };
 
   submitEventData = () => {
+    var user = JSON.parse(sessionStorage.user);
+
     let newNote = {
       title: this.state.title,
       start: this.state.start,
       end: this.state.end,
       noteBody: this.state.noteBody,
       priority: this.state.priority,
-      category: this.state.selectedCategory
+      category: this.state.selectedCategory,
+      user: parseInt(user.userId),
     };
 
     console.log("Note added", newNote);

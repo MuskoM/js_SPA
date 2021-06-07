@@ -24,6 +24,8 @@ class NotesList extends Component {
       end: add(new Date(), { hours: 3 }).toISOString().slice(0, -8),
       filter: "",
       sort: 1,
+      categories: undefined,
+      selectedCategory: undefined,
     };
   }
 
@@ -54,8 +56,16 @@ class NotesList extends Component {
   };
 
   componentDidMount = () => {
-    console.log(this.state)
     this.getData();
+    axios
+      .get(`http://localhost:8002/categories`)
+      .then((response) => {
+        let list = response.data;
+        this.setState({ categories: list, isLoading: false });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   editNote = (note) => {
@@ -109,9 +119,9 @@ class NotesList extends Component {
       .get(`http://localhost:8002/notes`)
       .then((response) => {
         let list = response.data;
-        if (this.state.filter !== "") {
-          console.log("myk filtracja");
-        }
+        var user = JSON.parse(sessionStorage.user);
+
+        list = list.filter(n => n.user == user.userId);
         this.setState({ notesList: list, fullList: list });
         this.setState({ isLoading: false });
         return list;
@@ -119,6 +129,7 @@ class NotesList extends Component {
       .catch((error) => {
         console.log(error);
       });
+
   }
 
   render() {
@@ -129,6 +140,9 @@ class NotesList extends Component {
       notesList = this.getData();
       return <div></div>;
     }
+
+    const categories = this.state.categories;
+    console.log("Kategorie", categories);
 
     const sortList = [
       { id: 1, name: "dataOd - rosnąco" },
@@ -156,14 +170,14 @@ class NotesList extends Component {
       return (
         <div className="NotesList">
           <div className="FilterBar">
-          <TextField
-            variant="filled"
-            value={this.state.filter}
-            label="Search"
-            onChange={this.handleFilterChange}
-            type="search" aria-label="Search"
-            className="SearchBar"
-          />
+            <TextField
+              variant="filled"
+              value={this.state.filter}
+              label="Search"
+              onChange={this.handleFilterChange}
+              type="search" aria-label="Search"
+              className="SearchBar"
+            />
             <TextField label="sort" className="SearchBar" value={this.state.sort} variant="filled" select onChange={this.handleSorting}>
               {sortList.map((option, i) => {
                 return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>)
@@ -261,6 +275,7 @@ class NotesList extends Component {
                   }}
                 ></Rating>
               </div>
+
               <div style={{ paddingBottom: "1rem" }}>
                 <PrimaryButton onClick={this.submitEventData}>
                   Submit
@@ -401,7 +416,8 @@ class NotesList extends Component {
       start: this.state.start,
       end: this.state.end,
       noteBody: this.state.noteBody,
-      priority: this.state.priority
+      priority: this.state.priority,
+      category: this.state.selectedCategory
     }
 
     console.log("Note added", newNote)

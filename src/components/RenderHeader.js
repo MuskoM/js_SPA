@@ -51,7 +51,7 @@ function RenderHeader() {
               aria-label="menu"
             ></IconButton>
             <Box display="flex" flexGrow={1}>
-                <Typography variant="h6">Calendar.app</Typography>
+              <img src="https://media.discordapp.net/attachments/594122304397508612/851527544972115988/Illustration.jpg" alt="ti" ></img>
             </Box>
             <Button color="inherit">
               <NavLink onClick={refresh} exact activeClassName="active" to="/">
@@ -90,7 +90,7 @@ function RenderHeader() {
               aria-label="menu"
             ></IconButton>
             <Box display="flex" flexGrow={1}>
-                <Typography variant="h6">Calendar.app</Typography>
+            <img src="https://media.discordapp.net/attachments/594122304397508612/851527544972115988/Illustration.jpg" alt="ti" ></img>
             </Box>
             <Button color="inherit">
               <NavLink onClick={refresh} exact activeClassName="active" to="/">

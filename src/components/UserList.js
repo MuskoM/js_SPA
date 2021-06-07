@@ -89,6 +89,16 @@ class UserList extends React.Component {
     var modal = document.getElementById("editModal");
     modal.style.display = "none";
     var user = this.state.currentUser;
+    var loggedUser = JSON.parse(sessionStorage.user);
+    if (user.username == loggedUser.username){
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: "You can't change your permissions",
+        type: "danger",
+      });
+      return;
+    }
     user.isAdmin = this.state.checked;
     console.log("User to save:", user);
     axios

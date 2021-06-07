@@ -558,6 +558,14 @@ app.delete("/users/:id", (req, res) => {
 
         if (idx != -1) {
             data.Users.splice(idx, 1);
+            let notes = data.Notes;
+            for (let i = 0; i < notes.length; i++){
+                if (parseInt(notes[i].user) === parseInt(req.params.id)){
+                    console.log(`Note with id ${notes[i].id} removed`);
+                    notes.splice(i--,1);
+                }
+            }
+            data.Notes = notes;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
                 if (err) {
@@ -638,8 +646,12 @@ app.listen(8002, () => {
     if (!fs.existsSync(file_path)) {
         console.log(`Data file not exists`);
         let data = {
-            Users: [],
-            Categories: [],
+            Users: [{username: "Admin", password: {salt: "1262af3607", hashedpassword: "b2a02d871b3b6f0432a13c471dcf28a279407d59e4ce29b79e13522a8b2d5dc77c51615ffa82de2016a200f59b8eacce1b9a42a22e5d4ca4e6ee38ce7b397176"}, firstname: "John", lastname: "Doe", id: 1, isAdmin: true}],
+            Categories: [{
+                id: 1,
+                name: "Inne",
+                description: "default category"
+            }],
             Notes: []
         };
         storage.save(data);
@@ -656,9 +668,23 @@ app.listen(8002, () => {
         if (notes == undefined)
             data.Notes = [];
         if (users == undefined)
-            data.Users = [];
+            data.Users = [{
+                username: "Admin",
+                password: {
+                    salt: "1262af3607",
+                    hashedpassword: "b2a02d871b3b6f0432a13c471dcf28a279407d59e4ce29b79e13522a8b2d5dc77c51615ffa82de2016a200f59b8eacce1b9a42a22e5d4ca4e6ee38ce7b397176"
+                },
+                firstname: "John",
+                lastname: "Doe",
+                id: 1,
+                isAdmin: true
+            }];
         if (categories == undefined)
-            data.Categories = [];
+            data.Categories = [{
+                id: 1,
+                name: "Inne",
+                description: "default category"
+            }];
         storage.save(data);
     });
 
