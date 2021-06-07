@@ -58,13 +58,9 @@ let Note = (props) => {
   let dataDo = new Date(props.dataDo).toLocaleDateString();
   let godzOd = new Date(props.dataOd).toLocaleTimeString();
   let godzDo = new Date(props.dataDo).toLocaleTimeString();
-  console.log(dataOd,godzOd)
   const [expanded, setExpanded] = React.useState(false);
   const [isLoading,setLoading] = React.useState(true)
 
-  React.useEffect(
-    ()=>{setLoading(false)}
-  )
   
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = React.useState(2);

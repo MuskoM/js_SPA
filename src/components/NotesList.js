@@ -20,7 +20,8 @@ class NotesList extends Component {
       isLoading: true,
       notesList: undefined,
       start:add(new Date(),{hours:2}).toISOString().slice(0,-8),
-      end:add(new Date(),{hours:3}).toISOString().slice(0,-8)
+      end:add(new Date(),{hours:3}).toISOString().slice(0,-8),
+      filter: "",
     };
   }
 
@@ -38,23 +39,45 @@ class NotesList extends Component {
     },
   };
 
-
   componentDidMount = () => {
-    axios
-      .get(`http://localhost:8002/notes`)
-      .then((response) => {
-        this.setState({ notesList: response.data });
-        this.setState({ isLoading: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    console.log(this.state)
+    // axios
+    //   .get(`http://localhost:8002/notes`)
+    //   .then((response) => {
+    //     let list = response.data;
+    //     if (this.state.filter !== ""){
+    //       console.log("myk filtracja");
+    //     }
+    //     this.setState({ notesList: list });
+    //     this.setState({ isLoading: false });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
+  
+
+  getData = () => {
+    // axios
+    //   .get(`http://localhost:8002/notes`)
+    //   .then((response) => {
+    //     let list = response.data;
+    //     if (this.state.filter !== ""){
+    //       console.log("myk filtracja");
+    //     }
+    //     this.setState({ notesList: list });
+    //     this.setState({ isLoading: false });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+  }
 
   render() {
     const { isLoading, notesList } = this.state;
 
-    if (isLoading) {      
+    if (isLoading) {
+      this.getData()  
       return <div>Loading...</div>;
     }
 
@@ -67,6 +90,11 @@ class NotesList extends Component {
     } else {
       return (
         <div className="NotesList">
+        <input
+        onChange={this.handleFilterChange}
+        placeholder={"Search name"}
+        class="form-control mr-sm-2 mb-3" type="search" aria-label="Search"
+      />
           {notesList.map((note, key) => {
             console.log(note.start)
             return (
@@ -80,6 +108,7 @@ class NotesList extends Component {
               ></Note>
             );
           })}
+
           <div className="modal" id="addEventModal">
             <div className="modal-content" id="addEventModalContent">
               <div className="modal-element">
@@ -190,6 +219,10 @@ class NotesList extends Component {
     modal.style.display = "none";
   };
 
+  handleFilterChange = (e) => {
+    console.log("Filter changed",e.target.value)
+    this.setState({isLoading : false, filter: e.target.value});
+  };
 
   editNoteData = () =>{
 
@@ -246,7 +279,7 @@ class NotesList extends Component {
             message: "Added a note!",
             type: "success",
           });
-          this.setState({isLoading : false});
+         // this.setState({isLoading : true});
         }
       ).catch((err)=>{
         console.log("Sending a note was unsucessful",err)
