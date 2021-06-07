@@ -1,6 +1,7 @@
 import axios from "axios";
 import { React, Component } from "react";
 import Note from "./Note";
+import add from "date-fns/add"
 import Rating from "@material-ui/lab/Rating";
 import { PriorityHigh } from "@material-ui/icons";
 import { PrimaryButton, SecondaryButton } from "./Buttons";
@@ -18,6 +19,8 @@ class NotesList extends Component {
     this.state = {
       isLoading: true,
       notesList: undefined,
+      start:add(new Date(),{hours:2}).toISOString().slice(0,-8),
+      end:add(new Date(),{hours:3}).toISOString().slice(0,-8)
     };
   }
 
@@ -51,7 +54,7 @@ class NotesList extends Component {
   render() {
     const { isLoading, notesList } = this.state;
 
-    if (isLoading) {
+    if (isLoading) {      
       return <div>Loading...</div>;
     }
 
@@ -65,6 +68,7 @@ class NotesList extends Component {
       return (
         <div className="NotesList">
           {notesList.map((note, key) => {
+            console.log(note.start)
             return (
               <Note
                 id={note.id}
@@ -84,10 +88,10 @@ class NotesList extends Component {
                   id="dataOd"
                   classes={{ root: "modal-element-label" }}
                   label="Data od"
-                  defaultValue="2017-05-24T10:30"
+                  defaultValue={add(new Date(),{hours:2}).toISOString().slice(0,-8)}
                   type="datetime-local"
                   onChange={(e) => {
-                    this.setState({ dataOd: e.target.value });
+                    this.setState({ start: e.target.value });
                   }}
                 ></TextField>
               </div>
@@ -96,10 +100,10 @@ class NotesList extends Component {
                   variant="outlined"
                   id="dataDo"
                   label="Data do"
-                  defaultValue="2017-05-24T10:30"
+                  defaultValue={add(new Date(),{hours:3}).toISOString().slice(0,-8)}
                   type="datetime-local"
                   onChange={(e) => {
-                    this.setState({ dataDo: e.target.value });
+                    this.setState({ end: e.target.value });
                   }}
                 ></TextField>
               </div>
@@ -186,8 +190,11 @@ class NotesList extends Component {
     modal.style.display = "none";
   };
 
-  submitEventData = () =>{
-    
+
+  editNoteData = () =>{
+
+    console.log(this.state)
+
     let newNote = {
         title:this.state.title,
         start:this.state.start,
@@ -198,7 +205,7 @@ class NotesList extends Component {
 
     console.log("Note added",newNote)
 
-      axios.post('http://localhost:8002/notes/',newNote).then(
+      axios.put('http://localhost:8002/notes/' ,newNote).then(
           (resp)=>{store.addNotification({
             ...this.notification,
             title: "Success!",
@@ -218,6 +225,41 @@ class NotesList extends Component {
       );
   }
 
+  submitEventData = () =>{
+
+    console.log(this.state)
+
+    let newNote = {
+        title:this.state.title,
+        start:this.state.start,
+        end:this.state.end,
+        noteBody:this.state.noteBody,
+        priority:this.state.priority
+    }
+
+    console.log("Note added",newNote)
+
+      axios.post('http://localhost:8002/notes/',newNote).then(
+          (resp)=>{store.addNotification({
+            ...this.notification,
+            title: "Success!",
+            message: "Added a note!",
+            type: "success",
+          });
+          this.setState({isLoading : false});
+        }
+      ).catch((err)=>{
+        console.log("Sending a note was unsucessful",err)
+      })
+
+      this.hideModal('addEventModal')
+
+      return (
+        <div>
+          <EventPopup />
+        </div>
+      );
+  }
 }
 
 export default NotesList;

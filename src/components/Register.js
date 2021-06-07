@@ -18,7 +18,14 @@ function Register(props) {
     setError(null);
     setLoading(true);
     if (confirmPassword.value !== password.value) {
+      setLoading(false);
       setError("Passwords don't match");
+      return;
+    }
+    var pattern=new RegExp("[A-Za-z]+$");
+    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
+      setLoading(false);
+      setError("Names cannot contains numbers");
       return;
     }
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
@@ -27,7 +34,7 @@ function Register(props) {
         setLoading(false);
         setUserSession(response.data.token, response.data.user);
         props.history.push('/dashboard')
-        window.location.reload(false);
+        // window.location.reload(false);
       }).catch(error => {
         setLoading(false);
         if (error.response.status !== 401 && error.response.status !== 400) {
@@ -84,16 +91,16 @@ function Register(props) {
               <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Username" {...username} minLength='1' maxLength='20'></TextField>
             </div>
             <div id="user-edit-field">
-              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="First Name" {...firstname} minLength='1' maxLength='20'></TextField>
+              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="First Name" {...firstname} minLength='1' maxLength='20' ></TextField>
             </div>
             <div id="user-edit-field">
-              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Last Name" {...lastname} minLength='1' maxLength='20'></TextField>
+              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Last Name" {...lastname} minLength='1' maxLength='20' ></TextField>
             </div>
             <div id="user-edit-field">
               <TextField id="user-edit-field" type="password" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Password" {...password} minLength='1' maxLength='20'></TextField>
             </div>
             <div id="user-edit-field">
-              <TextField type="password" id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Confirm Password" {...confirmPassword} minLength='1' maxLength='20'></TextField>
+              <TextField type="password" id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Confirm Password" {...confirmPassword} minLength='1' maxLength='20' ></TextField>
             </div>
             {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
             <div id="user-edit-field">

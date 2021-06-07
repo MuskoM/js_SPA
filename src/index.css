@@ -72,7 +72,7 @@ code {
   bottom: 25%;
   margin: auto;
   border-radius: 20px;
-  background: #7bb2d9;
+  background: #e9ebec;
 }
 
 .popup_inner button{
@@ -133,7 +133,7 @@ code {
 
 /* Modal Content */
 .modal-content {
-  background-color: #7bb2d9;
+  background-color: #e9ebec;
   color:#35393C;
   margin: auto;
   padding: 2%;
@@ -152,6 +152,13 @@ code {
 .modal-content button{
   margin-left: 30%;
   width: 40%;
+}
+
+.category-prio-pair{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* The Close Button */
@@ -222,7 +229,7 @@ code {
   display: flex;
   border-radius: .3rem;
   flex-direction: column;
-  background-color: #7bb2d9 ;
+  background-color: #e9ebec ;
 }
 
 .login-form-header{

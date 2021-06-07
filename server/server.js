@@ -91,7 +91,7 @@ app.post("/notes", (req, res) => {
         let noNotes = data.Notes.length;
         console.log(noNotes)
         if (noNotes > 0)
-            newNote.id = noNotes + 1
+            newNote.id = parseInt(data.Notes[noNotes-1].id) + 1
         else
             newNote.id = 1
         console.log(newNote)
@@ -266,7 +266,7 @@ app.post("/categories", (req, res) => {
         })
         var newCategory = req.body;
         if (categories.length > 0)
-            newCategory.id = categories[categories.length - 1].id + 1;
+            newCategory.id = parseInt(categories[categories.length - 1].id) + 1;
         else newCategory.id = 1;
         data.Categories.push(newCategory);
         var newList = JSON.stringify(data);
@@ -432,9 +432,15 @@ app.post("/users", (req, res) => {
         })
         var newUser = req.body;
         if (users.length > 0)
-            newUser.id = users[users.length - 1].id + 1;
+            newUser.id = parseInt(users[users.length - 1].id) + 1;
         else newUser.id = 1;
         if (newUser.isAdmin == undefined) newUser.isAdmin = false;
+        var salt = utils.generateSalt();
+        var hash = utils.hashPassword(newUser.password,salt); 
+        if (hash == null) {
+            return res.status(500).json({ error: true, message: `Password error`, errorKey: "defaultError" })
+        }
+        newUser.password = hash;
         data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
@@ -488,11 +494,16 @@ app.put("/users/:id", (req, res) => {
             });
         } else {
             if (req.body.oldPassword != null) {
-                if (user.password !== req.body.oldPassword) {
+                let validation = utils.matchHash(req.body.oldPassword, user.password);
+
+                if (!validation){
                     console.log('Invalid old password');
-                    return res.status(500).json({ errorKey: `wrongPassword` });
+                        return res.status(500).json({ errorKey: `wrongPassword` });
                 }
-                if (user.password === req.body.password) {
+                
+                validation = utils.matchHash(req.body.password, user.password);
+
+                if (validation){
                     console.log(`Password already used`);
                     return res.status(500).json({ errorKey: `alreadyUsedPassword` });
                 }
@@ -502,9 +513,17 @@ app.put("/users/:id", (req, res) => {
                 username: req.body.username != null ? req.body.username : user.username,
                 firstname: req.body.firstname != null ? req.body.firstname : user.firstname,
                 lastname: req.body.lastname != null ? req.body.lastname : user.lastname,
-                password: req.body.password != null ? req.body.password : user.password, //TODO:
                 isAdmin: req.body.isAdmin != null ? req.body.isAdmin : user.isAdmin
             }
+            if (req.body.password != null) {
+                var salt = utils.generateSalt();
+                var hash = utils.hashPassword(req.body.password,salt);
+                if (hash == null) {
+                    return res.status(500).json({ error: true, message: `Password error`, errorKey: "defaultError" })
+                }
+                editedUser.password = hash;
+            } else editedUser.password = user.password;
+
             var idx = data.Users.findIndex((n) => n.id == req.params.id);
             data.Users[idx] = editedUser;
             var newList = JSON.stringify(data);
@@ -576,8 +595,11 @@ app.post('/users/signin', function (req, res) {
         return res.status(401).json({ error: true, message: `User not found`, errorKey: `userNotFound` });
     }
 
-    if (user !== userData.username || pwd !== userData.password) {
-        return res.status(401).json({ error: true, message: `Invalid credentials`, errorKey: `invalidCredentials` });
+    let result = utils.matchHash(pwd,userData.password);
+
+    if (!result || user !== userData.username){
+        console.log(`Invalid credentials`);
+        return res.status(500).json({ errorKey: `Invalid credentials` });
     }
 
     const token = utils.generateToken(userData);

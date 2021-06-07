@@ -83,6 +83,12 @@ function EditUser(props) {
       setLoading(false);
       return;
     }
+    var pattern=new RegExp("[A-Za-z]+$");
+    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
+      setLoading(false);
+      setError("Names cannot contains numbers");
+      return;
+    }
     var user = JSON.parse(sessionStorage.user);
 
     axios
@@ -164,7 +170,7 @@ function EditUser(props) {
           </Paper>
           <Paper
             style={{
-              backgroundColor: "#7bb2d9",
+              backgroundColor: "#e9ebec",
               textAlign: "center",
               padding: "1rem",
             }}
@@ -215,7 +221,7 @@ function EditUser(props) {
           </Paper>
           <Paper
             style={{
-              backgroundColor: "#7bb2d9",
+              backgroundColor: "#e9ebec",
               textAlign: "center",
               padding: "1rem",
             }}

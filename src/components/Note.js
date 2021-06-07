@@ -29,7 +29,7 @@ let notification = {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    background: "#7bb2d9",
+    background: "#b3b8bc",
     width: "50%",
   },
   heading: {
@@ -55,10 +55,16 @@ const StyledRating = withStyles({
 let Note = (props) => {
   const classes = useStyles();
   let dataOd = new Date(props.dataOd).toLocaleDateString();
-  let dataDo = new Date(props.dataOd).toLocaleDateString();
+  let dataDo = new Date(props.dataDo).toLocaleDateString();
   let godzOd = new Date(props.dataOd).toLocaleTimeString();
-  let godzDo = new Date(props.dataOd).toLocaleTimeString();
+  let godzDo = new Date(props.dataDo).toLocaleTimeString();
+  console.log(dataOd,godzOd)
   const [expanded, setExpanded] = React.useState(false);
+  const [isLoading,setLoading] = React.useState(true)
+
+  React.useEffect(
+    ()=>{setLoading(false)}
+  )
   
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = React.useState(2);
@@ -69,13 +75,14 @@ let Note = (props) => {
 
   let deleteNote = (id) =>{
 
-    axios.delete('http://localhost:8002/notes/'+id).then(
+    axios.delete('http://localhost:8002/notes/'+ id).then(
       (resp)=>{store.addNotification({
         notification,
         title: "Success!",
         message: "Succesfully deleted a note.",
         type: "success",
       });
+      setLoading(true)
     }
   ).catch((err)=>{
     console.log("Can't delete a note",err)
@@ -83,7 +90,14 @@ let Note = (props) => {
   
   }
 
+
   let id = props.id;
+
+  if(isLoading){
+    return(
+      <div>Loading...</div>
+    )
+  }
 
   return (
     <Accordion
