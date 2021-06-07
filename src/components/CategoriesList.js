@@ -183,20 +183,20 @@ class Categories extends React.Component {
         accessor: "[buttons]",
         Cell: (cellObj) => (
           <>
-            <button
+            <PrimaryButton
+              className="Aux-btn"
               type="button"
-              class="btn btn-primary mr-4"
               onClick={() => this.editCategory(cellObj.row)}
             >
               Edit
-            </button>
-            <button
+            </PrimaryButton>
+            <SecondaryButton
+              className="Aux-btn"
               type="button"
-              class="btn btn-primary"
               onClick={() => this.deleteCategory(cellObj.row)}
             >
               Delete
-            </button>
+            </SecondaryButton>
           </>
         ),
       },
@@ -204,16 +204,6 @@ class Categories extends React.Component {
 
     return (
       <div>
-        <div>
-          <label>Add new category</label>
-          <button
-            type="button"
-            class="btn btn-primary"
-            onClick={() => this.createCategory()}
-          >
-            Create
-          </button>
-        </div>
         <Table columns={columns} data={this.state.categories} />
         <div id="editCategoryModal" class="modal">
           <div class="modal-content">
@@ -308,6 +298,14 @@ class Categories extends React.Component {
               Submit
             </SecondaryButton>
           </div>
+        </div>
+        <div style={{padding:".3rem"}}>
+          <PrimaryButton
+            type="button"
+            onClick={() => this.createCategory()}
+          >
+            Add category
+          </PrimaryButton>
         </div>
       </div>
     );

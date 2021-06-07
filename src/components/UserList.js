@@ -162,20 +162,18 @@ class UserList extends React.Component {
         accessor: "[buttons]",
         Cell: (cellObj) => (
           <>
-            <button
+            <PrimaryButton
               type="button"
-              class="btn btn-primary mr-4"
               onClick={() => this.editUser(cellObj.row)}
             >
               Edit
-            </button>
-            <button
+            </PrimaryButton>
+            <SecondaryButton
               type="button"
-              class="btn btn-primary"
               onClick={() => this.deleteUser(cellObj.row)}
             >
               Delete
-            </button>
+            </SecondaryButton>
           </>
         ),
       },

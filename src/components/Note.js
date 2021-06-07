@@ -69,24 +69,6 @@ let Note = (props) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  let deleteNote = (id) =>{
-
-    axios.delete('http://localhost:8002/notes/'+ id).then(
-      (resp)=>{store.addNotification({
-        notification,
-        title: "Success!",
-        message: "Succesfully deleted a note.",
-        type: "success",
-      });
-      setLoading(true)
-    }
-  ).catch((err)=>{
-    console.log("Can't delete a note",err)
-  })
-  
-  }
-
-
   let id = props.id;
 
   if(isLoading){
@@ -126,8 +108,8 @@ let Note = (props) => {
             </StyledRating>
         </div>
         <div style={{display:"flex",justifyContent:"space-between"}}>
-        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Edit</PrimaryButton>
-        <SecondaryButton onClick={()=>deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
+        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}} onClick={()=>props.editNote(props)}>Edit</PrimaryButton>
+        <SecondaryButton onClick={()=>props.deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
         </div>
       </AccordionDetails>
     </Accordion>

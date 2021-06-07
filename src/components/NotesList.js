@@ -9,7 +9,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import EventPopup from "./EventPopup";
 import {
-  TextField,
+  TextField, MenuItem
 } from "@material-ui/core";
 import { store } from "react-notifications-component";
 
@@ -19,9 +19,11 @@ class NotesList extends Component {
     this.state = {
       isLoading: true,
       notesList: undefined,
-      start:add(new Date(),{hours:2}).toISOString().slice(0,-8),
-      end:add(new Date(),{hours:3}).toISOString().slice(0,-8),
+      fullList: undefined,
+      start: add(new Date(), { hours: 2 }).toISOString().slice(0, -8),
+      end: add(new Date(), { hours: 3 }).toISOString().slice(0, -8),
       filter: "",
+      sort: 1,
     };
   }
 
@@ -39,34 +41,80 @@ class NotesList extends Component {
     },
   };
 
+  styles = {
+    root: {
+      background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+      borderRadius: 3,
+      border: 0,
+      color: 'white',
+      height: 48,
+      padding: '0 30px',
+      boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+    },
+  };
+
   componentDidMount = () => {
     console.log(this.state)
-    axios
-      .get(`http://localhost:8002/notes`)
-      .then((response) => {
-        let list = response.data;
-        if (this.state.filter !== ""){
-          console.log("myk filtracja");
-        }
-        this.setState({ notesList: list });
-        this.setState({ isLoading: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getData();
   };
-  
+
+  editNote = (note) => {
+
+    let newNote = {
+      id: note.id,
+      title: note.title,
+      start: note.dataOd,
+      end: note.dataDo,
+      noteBody: note.body + "Edited",
+      priority: note.priority
+    }
+
+    axios.put('http://localhost:8002/notes/' + note.id, newNote).then(
+      (resp) => {
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Succesfully updated a note.",
+          type: "success",
+        });
+        this.getData();
+      }
+    ).catch((err) => {
+      console.log("Can't delete a note", err)
+    }
+    )
+
+  }
+
+  deleteNote = (id) => {
+
+    axios.delete('http://localhost:8002/notes/' + id).then(
+      (resp) => {
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Succesfully deleted a note.",
+          type: "success",
+        });
+        this.getData();
+      }
+    ).catch((err) => {
+      console.log("Can't delete a note", err)
+    })
+  }
+
 
   getData = () => {
     axios
       .get(`http://localhost:8002/notes`)
       .then((response) => {
         let list = response.data;
-        if (this.state.filter !== ""){
+        if (this.state.filter !== "") {
           console.log("myk filtracja");
         }
-        this.setState({ notesList: list });
+        this.setState({ notesList: list, fullList: list });
         this.setState({ isLoading: false });
+        return list;
       })
       .catch((error) => {
         console.log(error);
@@ -74,31 +122,56 @@ class NotesList extends Component {
   }
 
   render() {
-    if (this.state.isLoading) {
-      this.getData();
-      return <div>Loading...</div>;
+    const { isLoading } = this.state;
+
+    let notesList = this.state.notesList;
+    if (isLoading) {
+      notesList = this.getData();
+      return <div></div>;
     }
 
-    const { isLoading, notesList } = this.state;
-
-
+    const sortList = [
+      { id: 1, name: "dataOd - rosnąco" },
+      { id: 2, name: "dataOd - malejąco" },
+      { id: 3, name: "dataDo - rosnąco" },
+      { id: 4, name: "dataDo - malejąco" },
+      { id: 5, name: "tytuł - rosnąco" },
+      { id: 6, name: "tytuł - malejąco" }];
 
     if (notesList.length === 0) {
       return (
         <div className="NotesList">
+          <TextField
+            value={this.state.filter}
+            variant="outlined"
+            label="Search"
+            onChange={this.handleFilterChange}
+            type="search" aria-label="Search"
+            className="SearchBar"
+          ></TextField>
           <h3>No notes to view</h3>
         </div>
       );
     } else {
       return (
         <div className="NotesList">
-        <input
-        onChange={this.handleFilterChange}
-        placeholder={"Search name"}
-        class="form-control mr-sm-2 mb-3" type="search" aria-label="Search"
-      />
+          <div className="FilterBar">
+          <TextField
+            variant="filled"
+            value={this.state.filter}
+            label="Search"
+            onChange={this.handleFilterChange}
+            type="search" aria-label="Search"
+            className="SearchBar"
+          />
+            <TextField label="sort" className="SearchBar" value={this.state.sort} variant="filled" select onChange={this.handleSorting}>
+              {sortList.map((option, i) => {
+                return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>)
+              })}
+
+            </TextField>
+          </div>
           {notesList.map((note, key) => {
-            console.log(note.start)
             return (
               <Note
                 id={note.id}
@@ -107,6 +180,8 @@ class NotesList extends Component {
                 priority={note.priority}
                 dataOd={note.start}
                 dataDo={note.end}
+                deleteNote={this.deleteNote}
+                editNote={this.editNote}
               ></Note>
             );
           })}
@@ -119,7 +194,7 @@ class NotesList extends Component {
                   id="dataOd"
                   classes={{ root: "modal-element-label" }}
                   label="Data od"
-                  defaultValue={add(new Date(),{hours:2}).toISOString().slice(0,-8)}
+                  defaultValue={add(new Date(), { hours: 2 }).toISOString().slice(0, -8)}
                   type="datetime-local"
                   onChange={(e) => {
                     this.setState({ start: e.target.value });
@@ -131,7 +206,7 @@ class NotesList extends Component {
                   variant="outlined"
                   id="dataDo"
                   label="Data do"
-                  defaultValue={add(new Date(),{hours:3}).toISOString().slice(0,-8)}
+                  defaultValue={add(new Date(), { hours: 3 }).toISOString().slice(0, -8)}
                   type="datetime-local"
                   onChange={(e) => {
                     this.setState({ end: e.target.value });
@@ -202,8 +277,8 @@ class NotesList extends Component {
               </div>
             </div>
           </div>
-          <Fab onClick={()=>this.showModal("addEventModal")} variant="extended" style={{margin:'1rem',backgroundColor:"#ffd400"}}>
-            <AddIcon/>
+          <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
+            <AddIcon />
             Add
           </Fab>
         </div>
@@ -221,79 +296,137 @@ class NotesList extends Component {
     modal.style.display = "none";
   };
 
-  handleFilterChange = (e) => {
-    console.log("Filter changed",e.target.value)
-    this.setState({isLoading : false, filter: e.target.value});
-  };
-
-  editNoteData = () =>{
-
-    console.log(this.state)
-
-    let newNote = {
-        title:this.state.title,
-        start:this.state.start,
-        end:this.state.end,
-        noteBody:this.state.noteBody,
-        priority:this.state.priority
-    }
-
-    console.log("Note added",newNote)
-
-      axios.put('http://localhost:8002/notes/' ,newNote).then(
-          (resp)=>{store.addNotification({
-            ...this.notification,
-            title: "Success!",
-            message: "Added a note!",
-            type: "success",
-          });}
-      ).catch((err)=>{
-        console.log("Sending a note was unsucessful",err)
-      })
-
-      this.hideModal('addEventModal')
-
-      return (
-        <div>
-          <EventPopup />
-        </div>
-      );
+  updateFilter = (e) => {
+    this.setState({ filter: e.target.value });
   }
 
-  submitEventData = () =>{
+  handleFilterChange = (e) => {
+    console.log("Filter changed", e.target.value);
+    let list = this.state.fullList.filter(n => n.title.includes(e.target.value));
+    console.log("list", list);
+    this.setState({ filter: e.target.value, notesList: list });
+  };
 
-    console.log(this.state)
+  handleSorting = (e) => {
+    let sortVal = e.target.value;
+    console.log("STATE", sortVal);
+    this.setState({ sort: sortVal })
+
+    switch (sortVal) {
+      case 1:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.start > b.start) ? 1 : -1;
+          })
+        })
+        break;
+      case 2:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.start > b.start) ? -1 : 1;
+          })
+        })
+        break;
+      case 3:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.end > b.end) ? 1 : -1;
+          })
+        })
+        break;
+      case 4:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.end > b.end) ? -1 : 1;
+          })
+        })
+        break;
+      case 5:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.title > b.title) ? 1 : -1;
+          })
+        })
+        break;
+      case 6:
+        this.setState({
+          noteList: this.state.notesList.sort((a, b) => {
+            return (a.title > b.title) ? -1 : 1;
+          })
+        })
+        break;
+      default:
+        break;
+    }
+  }
+
+  editNoteData = () => {
 
     let newNote = {
-        title:this.state.title,
-        start:this.state.start,
-        end:this.state.end,
-        noteBody:this.state.noteBody,
-        priority:this.state.priority
+      title: this.state.title,
+      start: this.state.start,
+      end: this.state.end,
+      noteBody: this.state.noteBody,
+      priority: this.state.priority
     }
 
-    console.log("Note added",newNote)
+    console.log("Note edited", newNote)
 
-      axios.post('http://localhost:8002/notes/',newNote).then(
-          (resp)=>{store.addNotification({
-            ...this.notification,
-            title: "Success!",
-            message: "Added a note!",
-            type: "success",
-          });
-         this.setState({isLoading : true});
-        }
-      ).catch((err)=>{
-        console.log("Sending a note was unsucessful",err)
-      })
+    axios.put('http://localhost:8002/notes/', newNote).then(
+      (resp) => {
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Added a note!",
+          type: "success",
+        });
+      }
+    ).catch((err) => {
+      console.log("Sending a note was unsucessful", err)
+    })
 
-      this.hideModal('addEventModal')
+    this.hideModal('addEventModal')
 
-      return (
-        <div>
-          <EventPopup />
-        </div>
-      );
+    return (
+      <div>
+        <EventPopup />
+      </div>
+    );
+  }
+
+  submitEventData = () => {
+
+    let newNote = {
+      title: this.state.title,
+      start: this.state.start,
+      end: this.state.end,
+      noteBody: this.state.noteBody,
+      priority: this.state.priority
+    }
+
+    console.log("Note added", newNote)
+
+    axios.post('http://localhost:8002/notes/', newNote).then(
+      (resp) => {
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Added a note!",
+          type: "success",
+        });
+        this.setState({ isLoading: true });
+      }
+    ).catch((err) => {
+      console.log("Sending a note was unsucessful", err)
+    })
+
+    this.hideModal('addEventModal')
+
+    return (
+      <div>
+        <EventPopup />
+      </div>
+    );
   }
 }
 
