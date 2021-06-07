@@ -41,45 +41,47 @@ class NotesList extends Component {
 
   componentDidMount = () => {
     console.log(this.state)
-    // axios
-    //   .get(`http://localhost:8002/notes`)
-    //   .then((response) => {
-    //     let list = response.data;
-    //     if (this.state.filter !== ""){
-    //       console.log("myk filtracja");
-    //     }
-    //     this.setState({ notesList: list });
-    //     this.setState({ isLoading: false });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    axios
+      .get(`http://localhost:8002/notes`)
+      .then((response) => {
+        let list = response.data;
+        if (this.state.filter !== ""){
+          console.log("myk filtracja");
+        }
+        this.setState({ notesList: list });
+        this.setState({ isLoading: false });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   
 
   getData = () => {
-    // axios
-    //   .get(`http://localhost:8002/notes`)
-    //   .then((response) => {
-    //     let list = response.data;
-    //     if (this.state.filter !== ""){
-    //       console.log("myk filtracja");
-    //     }
-    //     this.setState({ notesList: list });
-    //     this.setState({ isLoading: false });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    axios
+      .get(`http://localhost:8002/notes`)
+      .then((response) => {
+        let list = response.data;
+        if (this.state.filter !== ""){
+          console.log("myk filtracja");
+        }
+        this.setState({ notesList: list });
+        this.setState({ isLoading: false });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   render() {
-    const { isLoading, notesList } = this.state;
-
-    if (isLoading) {
-      this.getData()  
+    if (this.state.isLoading) {
+      this.getData();
       return <div>Loading...</div>;
     }
+
+    const { isLoading, notesList } = this.state;
+
+
 
     if (notesList.length === 0) {
       return (
@@ -279,7 +281,7 @@ class NotesList extends Component {
             message: "Added a note!",
             type: "success",
           });
-         // this.setState({isLoading : true});
+         this.setState({isLoading : true});
         }
       ).catch((err)=>{
         console.log("Sending a note was unsucessful",err)
