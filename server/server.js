@@ -91,7 +91,7 @@ app.post("/notes", (req, res) => {
         let noNotes = data.Notes.length;
         console.log(noNotes)
         if (noNotes > 0)
-            newNote.id = noNotes + 1
+            newNote.id = parseInt(data.Notes[noNotes-1].id) + 1
         else
             newNote.id = 1
         console.log(newNote)
@@ -252,13 +252,13 @@ app.post("/categories", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var category = data.Categories.find((c) => c.id == req.body.id);
+        var category = data.Categories.find((c) => c.id == req.body.id || c.name == req.body.name);
         if (category) {
             console.log(`Category with id = ${req.body.id} already exists`);
-            res
-                .status(500)
+            return res
+                .status(409)
                 .send(`Category with id = ${req.body.id} already exists`);
-            return;
+            
         }
         var categories = data.Categories;
         categories.sort((a, b) => {
@@ -266,7 +266,7 @@ app.post("/categories", (req, res) => {
         })
         var newCategory = req.body;
         if (categories.length > 0)
-            newCategory.id = categories[categories.length - 1].id + 1;
+            newCategory.id = parseInt(categories[categories.length - 1].id) + 1;
         else newCategory.id = 1;
         data.Categories.push(newCategory);
         var newList = JSON.stringify(data);
@@ -300,7 +300,7 @@ app.put("/categories/:id", (req, res) => {
                 .send(`Category with id = ${categoryBody.id} already exists`);
             return;
         }
-        var category = data.Categories.find((c) => c.id == req.params.id);
+        var category = data.Categories.find((c) => c.id == req.params.id || c.name == req.body.name);
         if (!category) {
             data.Categories.push(req.body);
             var newList = JSON.stringify(data);
@@ -318,6 +318,11 @@ app.put("/categories/:id", (req, res) => {
                 }
             });
         } else {
+            if (category.id != req.params.id) {
+                return res
+                .status(409)
+                .send(`Category with id = ${req.body.id} already exists`);
+            }
             var idx = data.Categories.findIndex((n) => n.id == req.params.id);
             req.body.id = req.params.id;
             data.Categories[idx] = req.body;
@@ -427,9 +432,15 @@ app.post("/users", (req, res) => {
         })
         var newUser = req.body;
         if (users.length > 0)
-            newUser.id = users[users.length - 1].id + 1;
+            newUser.id = parseInt(users[users.length - 1].id) + 1;
         else newUser.id = 1;
         if (newUser.isAdmin == undefined) newUser.isAdmin = false;
+        var salt = utils.generateSalt();
+        var hash = utils.hashPassword(newUser.password,salt); 
+        if (hash == null) {
+            return res.status(500).json({ error: true, message: `Password error`, errorKey: "defaultError" })
+        }
+        newUser.password = hash;
         data.Users.push(newUser);
         var newList = JSON.stringify(data);
         fs.writeFile(file_path, newList, (err) => {
@@ -483,11 +494,16 @@ app.put("/users/:id", (req, res) => {
             });
         } else {
             if (req.body.oldPassword != null) {
-                if (user.password !== req.body.oldPassword) {
+                let validation = utils.matchHash(req.body.oldPassword, user.password);
+
+                if (!validation){
                     console.log('Invalid old password');
-                    return res.status(500).json({ errorKey: `wrongPassword` });
+                        return res.status(500).json({ errorKey: `wrongPassword` });
                 }
-                if (user.password === req.body.password) {
+                
+                validation = utils.matchHash(req.body.password, user.password);
+
+                if (validation){
                     console.log(`Password already used`);
                     return res.status(500).json({ errorKey: `alreadyUsedPassword` });
                 }
@@ -497,9 +513,17 @@ app.put("/users/:id", (req, res) => {
                 username: req.body.username != null ? req.body.username : user.username,
                 firstname: req.body.firstname != null ? req.body.firstname : user.firstname,
                 lastname: req.body.lastname != null ? req.body.lastname : user.lastname,
-                password: req.body.password != null ? req.body.password : user.password, //TODO:
                 isAdmin: req.body.isAdmin != null ? req.body.isAdmin : user.isAdmin
             }
+            if (req.body.password != null) {
+                var salt = utils.generateSalt();
+                var hash = utils.hashPassword(req.body.password,salt);
+                if (hash == null) {
+                    return res.status(500).json({ error: true, message: `Password error`, errorKey: "defaultError" })
+                }
+                editedUser.password = hash;
+            } else editedUser.password = user.password;
+
             var idx = data.Users.findIndex((n) => n.id == req.params.id);
             data.Users[idx] = editedUser;
             var newList = JSON.stringify(data);
@@ -534,6 +558,14 @@ app.delete("/users/:id", (req, res) => {
 
         if (idx != -1) {
             data.Users.splice(idx, 1);
+            let notes = data.Notes;
+            for (let i = 0; i < notes.length; i++){
+                if (parseInt(notes[i].user) === parseInt(req.params.id)){
+                    console.log(`Note with id ${notes[i].id} removed`);
+                    notes.splice(i--,1);
+                }
+            }
+            data.Notes = notes;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
                 if (err) {
@@ -571,8 +603,11 @@ app.post('/users/signin', function (req, res) {
         return res.status(401).json({ error: true, message: `User not found`, errorKey: `userNotFound` });
     }
 
-    if (user !== userData.username || pwd !== userData.password) {
-        return res.status(401).json({ error: true, message: `Invalid credentials`, errorKey: `invalidCredentials` });
+    let result = utils.matchHash(pwd,userData.password);
+
+    if (!result || user !== userData.username){
+        console.log(`Invalid credentials`);
+        return res.status(500).json({ errorKey: `Invalid credentials` });
     }
 
     const token = utils.generateToken(userData);
@@ -611,8 +646,12 @@ app.listen(8002, () => {
     if (!fs.existsSync(file_path)) {
         console.log(`Data file not exists`);
         let data = {
-            Users: [],
-            Categories: [],
+            Users: [{username: "Admin", password: {salt: "1262af3607", hashedpassword: "b2a02d871b3b6f0432a13c471dcf28a279407d59e4ce29b79e13522a8b2d5dc77c51615ffa82de2016a200f59b8eacce1b9a42a22e5d4ca4e6ee38ce7b397176"}, firstname: "John", lastname: "Doe", id: 1, isAdmin: true}],
+            Categories: [{
+                id: 1,
+                name: "Inne",
+                description: "default category"
+            }],
             Notes: []
         };
         storage.save(data);
@@ -629,9 +668,23 @@ app.listen(8002, () => {
         if (notes == undefined)
             data.Notes = [];
         if (users == undefined)
-            data.Users = [];
+            data.Users = [{
+                username: "Admin",
+                password: {
+                    salt: "1262af3607",
+                    hashedpassword: "b2a02d871b3b6f0432a13c471dcf28a279407d59e4ce29b79e13522a8b2d5dc77c51615ffa82de2016a200f59b8eacce1b9a42a22e5d4ca4e6ee38ce7b397176"
+                },
+                firstname: "John",
+                lastname: "Doe",
+                id: 1,
+                isAdmin: true
+            }];
         if (categories == undefined)
-            data.Categories = [];
+            data.Categories = [{
+                id: 1,
+                name: "Inne",
+                description: "default category"
+            }];
         storage.save(data);
     });
 

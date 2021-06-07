@@ -72,7 +72,7 @@ code {
   bottom: 25%;
   margin: auto;
   border-radius: 20px;
-  background: #7bb2d9;
+  background: #e9ebec;
 }
 
 .popup_inner button{
@@ -133,7 +133,7 @@ code {
 
 /* Modal Content */
 .modal-content {
-  background-color: #7bb2d9;
+  background-color: #e9ebec;
   color:#35393C;
   margin: auto;
   padding: 2%;
@@ -152,6 +152,13 @@ code {
 .modal-content button{
   margin-left: 30%;
   width: 40%;
+}
+
+.category-prio-pair{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* The Close Button */
@@ -182,6 +189,7 @@ code {
   border: .3rem dotted rgba(0, 0, 0, 0.3);
   padding: .4rem;
 }
+
 
 
 /*User edit panel*/
@@ -222,7 +230,7 @@ code {
   display: flex;
   border-radius: .3rem;
   flex-direction: column;
-  background-color: #7bb2d9 ;
+  background-color: #e9ebec ;
 }
 
 .login-form-header{
@@ -242,4 +250,20 @@ code {
   margin-bottom: 1rem;
   flex-direction: row;
   justify-content: center;
+}
+
+.SearchBar{
+  background: #e9ebec;
+  color: rgb(169 49 49 / 87%);
+  padding: 0 30px;
+}
+
+.FilterBar{
+  margin: 1rem;
+  padding: 1rem;
+}
+
+.Aux-btn{
+  margin: .5rem;
+  padding: .5rem;
 }

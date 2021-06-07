@@ -1,6 +1,7 @@
 // generate token using secret from process.env.JWT_SECRET
 var jwt = require('jsonwebtoken');
-
+var crypto = require('crypto');
+const saltRounds = 10;
 // generate token and return it
 generateToken = (user) => {
   //1. Don't use password and other sensitive fields
@@ -33,7 +34,32 @@ getCleanUser = (user) => {
   };
 }
 
+generateSalt = () => {
+  return crypto.randomBytes(Math.ceil(saltRounds / 2)).toString('hex').slice(0, saltRounds);
+}
+
+hashPassword = (password, salt) => {
+  let hash = crypto.createHmac('sha512', salt);
+  hash.update(password);
+  let value = hash.digest('hex');
+  return {
+    salt: salt,
+    hashedpassword: value
+  };
+}
+
+matchHash = (password, hash) => {
+  let passwordData = hashPassword(password, hash.salt);
+  if (passwordData.hashedpassword === hash.hashedpassword) {
+    return true;
+  }
+  return false
+}
+
 module.exports = {
   generateToken,
-  getCleanUser
+  getCleanUser,
+  generateSalt,
+  hashPassword,
+  matchHash
 }

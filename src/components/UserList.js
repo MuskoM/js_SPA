@@ -79,7 +79,7 @@ class UserList extends React.Component {
         store.addNotification({
           ...this.notification,
           title: "Error!",
-          message: error,
+          message: error.message,
           type: "danger",
         });
       });
@@ -89,6 +89,16 @@ class UserList extends React.Component {
     var modal = document.getElementById("editModal");
     modal.style.display = "none";
     var user = this.state.currentUser;
+    var loggedUser = JSON.parse(sessionStorage.user);
+    if (user.username == loggedUser.username){
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: "You can't change your permissions",
+        type: "danger",
+      });
+      return;
+    }
     user.isAdmin = this.state.checked;
     console.log("User to save:", user);
     axios
@@ -110,7 +120,7 @@ class UserList extends React.Component {
         store.addNotification({
           ...this.notification,
           title: "Error!",
-          message: error,
+          message: error.message,
           type: "danger",
         });
       });
@@ -136,10 +146,10 @@ class UserList extends React.Component {
     var deleteModal = document.getElementById("deleteModal");
 
     window.onclick = function (event) {
-      if (event.target == editModal) {
+      if (event.target === editModal) {
         editModal.style.display = "none";
       }
-      if (event.target == deleteModal) {
+      if (event.target === deleteModal) {
         editModal.style.display = "none";
       }
     };
@@ -162,20 +172,18 @@ class UserList extends React.Component {
         accessor: "[buttons]",
         Cell: (cellObj) => (
           <>
-            <button
+            <PrimaryButton
               type="button"
-              class="btn btn-primary mr-4"
               onClick={() => this.editUser(cellObj.row)}
             >
               Edit
-            </button>
-            <button
+            </PrimaryButton>
+            <SecondaryButton
               type="button"
-              class="btn btn-primary"
               onClick={() => this.deleteUser(cellObj.row)}
             >
               Delete
-            </button>
+            </SecondaryButton>
           </>
         ),
       },

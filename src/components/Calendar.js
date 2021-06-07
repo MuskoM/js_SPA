@@ -1,26 +1,19 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import interactionPlugin from "@fullcalendar/interaction";
 import React from "react";
-import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
-import {PrimaryButton,SecondaryButton} from './Buttons'
+import { getWeek } from "date-fns";
+import { PriorityHigh } from "@material-ui/icons";
+// import {LocalConvenienceStoreOutlined } from '@material-ui/icons'
+import { PrimaryButton, SecondaryButton } from "./Buttons";
 import EventPopup from "./EventPopup";
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  TextField,
-  DialogActions,
-  TextareaAutosize,
-} from "@material-ui/core";
+import { Select, TextField, MenuItem } from "@material-ui/core";
 import { store } from "react-notifications-component";
 
-
-class DayGridCalendar extends React.Component {}
+class DayGridCalendar extends React.Component { }
 
 class WeeklyCalendar extends React.Component {
   constructor(props) {
@@ -30,7 +23,10 @@ class WeeklyCalendar extends React.Component {
       end: undefined,
       title: "",
       noteBody: "",
+      selectedCategory: undefined,
+      isLoading: true,
       priority: 2,
+      categories: undefined,
     };
   }
 
@@ -49,11 +45,21 @@ class WeeklyCalendar extends React.Component {
   };
 
   render() {
+
+    const { isLoading, categories } = this.state;
+
+    if (isLoading) {
+      return <div>Loading...</div>;
+    }
+
+    console.log(categories)
+
     return (
       <div>
         <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          timeZone="Europe/Warsaw"
+          plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
+          initialView="timeGridWeek"
           eventSources={[
             {
               id: 1,
@@ -63,9 +69,23 @@ class WeeklyCalendar extends React.Component {
               method: "GET",
             },
           ]}
-          height={window.innerHeight - 250}
+          height={window.innerHeight - 100}
           aspectRatio={0.5}
+          firstDay={1}
+          weekNumbers
+          weekNumberCalculation={(date) => {
+            return getWeek(date) % 2 ? 2 : 1;
+          }}
           selectable={true}
+          slotDuration="01:00:00"
+          slotMinTime="07:00:00"
+          expandRows
+          slotMaxTime="23:00:00"
+          headerToolbar={{
+            start: "title",
+            center: "dayGridMonth,timeGridWeek,timeGridDay",
+            end: "today,prev,next",
+          }}
           select={this.addEvent}
         />
         <div className="modal" id="addEventModal">
@@ -78,8 +98,8 @@ class WeeklyCalendar extends React.Component {
                 label="Data od"
                 defaultValue="2017-05-24T10:30"
                 type="datetime-local"
-                onChange={(e)=>{
-                    this.setState({dataOd:e.target.value})
+                onChange={(e) => {
+                  this.setState({ start: e.target.value });
                 }}
               ></TextField>
             </div>
@@ -90,65 +110,111 @@ class WeeklyCalendar extends React.Component {
                 label="Data do"
                 defaultValue="2017-05-24T10:30"
                 type="datetime-local"
-                onChange={(e)=>{
-                    this.setState({dataDo:e.target.value})
+                onChange={(e) => {
+                  this.setState({ end: e.target.value });
                 }}
               ></TextField>
             </div>
             <div className="modal-element">
-              <TextField 
-              variant="outlined"
-              id="title"
-              label="Tytuł" 
-              type="text"
-              onChange={(e)=>{
-                this.setState({title:e.target.value})
-            }}
+              <TextField
+                variant="outlined"
+                id="title"
+                label="Tytuł"
+                type="text"
+                onChange={(e) => {
+                  this.setState({ title: e.target.value });
+                }}
               ></TextField>
             </div>
             <div className="modal-element">
-              <TextField 
-              variant="outlined"
-              id="noteBody"
-              label="Notatka" 
-              multiline={true} rows={4}
-              onChange={(e)=>{
-                this.setState({noteBody:e.target.value})
-            }}
+              <TextField
+                variant="outlined"
+                id="noteBody"
+                label="Notatka"
+                multiline={true}
+                rows={4}
+                onChange={(e) => {
+                  this.setState({ noteBody: e.target.value });
+                }}
               ></TextField>
             </div>
-            <div className="modal-element" style={{border:' 0.5px solid rgba(0,0,0,.2)',borderRadius:".3rem",marginTop:'1rem',marginBottom:'1rem',paddingLeft:"0.5rem",width:"30%"}}>
-                <label>Priority</label><br></br>
-              <Rating
-              id="prioritySelector" 
-              max={3}
-              classes={{iconFilled:"priority-icon-filled"}}
-              defaultValue={2}
-              name="priority"
-              icon={<PriorityHigh fontSize="inherit"/>}
-              onChange={(e)=>{
-                this.setState({priority:e.target.value})
-            }}></Rating>
+
+            <div className="category-prio-pair">
+              <div
+                className="modal-element"
+                style={{
+                  border: " 0.5px solid rgba(0,0,0,.2)",
+                  borderRadius: ".3rem",
+                  marginTop: "1rem",
+                  marginBottom: "1rem",
+                  paddingLeft: "0.5rem",
+                  width: "30%",
+                }}
+              >
+                <label>Priority</label>
+                <br></br>
+                <Rating
+                  id="prioritySelector"
+                  max={3}
+                  classes={{ iconFilled: "priority-icon-filled" }}
+                  defaultValue={2}
+                  name="priority"
+                  icon={<PriorityHigh fontSize="inherit" />}
+                  onChange={(e) => {
+                    this.setState({ priority: e.target.value });
+                  }}
+                ></Rating>
+              </div>
+              <div className="modal-element">
+                <TextField label="Kategoria" value={this.state.selectedCategory} variant="outlined" select onChange={(e) => {
+                  this.setState({ selectedCategory: e.target.value })
+                }}>
+                  {categories.map((option, i) => {
+                    return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>)
+                  })}
+
+                </TextField>
+              </div>
             </div>
-            <div style={{paddingBottom:'1rem'}}>
-            <PrimaryButton onClick={this.submitEventData}>
+
+            <div style={{ paddingBottom: "1rem" }}>
+              <PrimaryButton onClick={this.submitEventData}>
                 Submit
-            </PrimaryButton>
+              </PrimaryButton>
             </div>
             <div>
-            <SecondaryButton
-              onClick={() => {
-                this.hideModal("addEventModal");
-              }}
-            >
-              Close
-            </SecondaryButton>
+              <SecondaryButton
+                onClick={() => {
+                  this.hideModal("addEventModal");
+                }}
+              >
+                Close
+              </SecondaryButton>
             </div>
           </div>
         </div>
+        <PrimaryButton
+          onClick={() => {
+            console.log(this.state);
+          }}
+        >
+          TEST
+        </PrimaryButton>
       </div>
     );
   }
+
+  componentDidMount = () => {
+    axios
+      .get("http://localhost:8002/categories")
+      .then((resp) => {
+        this.setState({ categories: resp.data, selectedCategory: resp.data[0].id });
+        this.setState({ isLoading: false });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   showModal = (name) => {
     var modal = document.getElementById(name);
@@ -160,56 +226,58 @@ class WeeklyCalendar extends React.Component {
     modal.style.display = "none";
   };
 
-  submitEventData = () =>{
-    
+  submitEventData = () => {
+    var user = JSON.parse(sessionStorage.user);
+
     let newNote = {
-        title:this.state.title,
-        start:this.state.start,
-        end:this.state.end,
-        noteBody:this.state.noteBody,
-        priority:this.state.priority
-    }
+      title: this.state.title,
+      start: this.state.start,
+      end: this.state.end,
+      noteBody: this.state.noteBody,
+      priority: this.state.priority,
+      category: this.state.selectedCategory,
+      user: parseInt(user.userId),
+    };
 
-    console.log("Note added",newNote)
+    console.log("Note added", newNote);
 
-    this.state.calendar.addEvent(
-        newNote,
-        true
-      );
+    this.state.calendar.addEvent(newNote, true);
 
-      axios.post('http://localhost:8002/notes/',newNote).then(
-          (resp)=>{store.addNotification({
-            ...this.notification,
-            title: "Success!",
-            message: "Added a note!",
-            type: "success",
-          });}
-      ).catch((err)=>{
-        console.log("Sending a note was unsucessful",err)
+    axios
+      .post("http://localhost:8002/notes/", newNote)
+      .then((resp) => {
+        store.addNotification({
+          ...this.notification,
+          title: "Success!",
+          message: "Added a note!",
+          type: "success",
+        });
       })
+      .catch((err) => {
+        console.log("Sending a note was unsucessful", err);
+      });
 
-      this.hideModal('addEventModal')
+    this.hideModal("addEventModal");
 
-      return (
-        <div>
-          <EventPopup />
-        </div>
-      );
-  }
+    return (
+      <div>
+        <EventPopup />
+      </div>
+    );
+  };
 
   addEvent = (info) => {
     console.log(info);
     this.showModal("addEventModal");
-    this.setState({calendar:info.view.calendar})
-    let dataOd = document.getElementById("dataOd")
-    dataOd.value = info.start.toISOString().slice(0,-8)
-    this.setState({start:info.start.toISOString().slice(0,-8)})
+    this.setState({ calendar: info.view.calendar });
+    let dataOd = document.getElementById("dataOd");
+    dataOd.value = info.start.toISOString().slice(0, -8);
+    this.setState({ start: info.start.toISOString().slice(0, -8) });
 
-    let dataDo = document.getElementById("dataDo")
-    this.setState({end:info.end.toISOString().slice(0,-8)})
-    dataDo.value = info.end.toISOString().slice(0,-8)
+    let dataDo = document.getElementById("dataDo");
+    this.setState({ end: info.end.toISOString().slice(0, -8) });
+    dataDo.value = info.end.toISOString().slice(0, -8);
   };
-
 }
 
 export { DayGridCalendar, WeeklyCalendar };

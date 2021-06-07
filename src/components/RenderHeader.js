@@ -1,5 +1,9 @@
+
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
+// eslint-disable-next-line no-unused-vars
 import makeStyles from '@material-ui/core/styles/makeStyles'
+// eslint-disable-next-line no-unused-vars
 import { getUser, getToken, getAdmin } from "../utils/Common";
 import { NavLink } from "react-router-dom";
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -26,7 +30,9 @@ const theme = createMuiTheme({
 
 
 function RenderHeader() {
-  const user = getUser();
+  // const user = getUser();
+
+  // eslint-disable-next-line no-unused-vars
   const [value, setValue] = useState();
 
   const refresh = () => {
@@ -45,7 +51,7 @@ function RenderHeader() {
               aria-label="menu"
             ></IconButton>
             <Box display="flex" flexGrow={1}>
-                <Typography variant="h6">Calendar.app</Typography>
+              <img src="https://media.discordapp.net/attachments/594122304397508612/851527544972115988/Illustration.jpg" alt="ti" ></img>
             </Box>
             <Button color="inherit">
               <NavLink onClick={refresh} exact activeClassName="active" to="/">
@@ -84,7 +90,7 @@ function RenderHeader() {
               aria-label="menu"
             ></IconButton>
             <Box display="flex" flexGrow={1}>
-                <Typography variant="h6">Calendar.app</Typography>
+            <img src="https://media.discordapp.net/attachments/594122304397508612/851527544972115988/Illustration.jpg" alt="ti" ></img>
             </Box>
             <Button color="inherit">
               <NavLink onClick={refresh} exact activeClassName="active" to="/">

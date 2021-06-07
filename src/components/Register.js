@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { setUserSession } from '../utils/Common';
+import { Paper, TextField } from "@material-ui/core";
+import { PrimaryButton, SecondaryButton } from "./Buttons";
 
 function Register(props) {
   const [loading, setLoading] = useState(false);
@@ -12,11 +14,18 @@ function Register(props) {
   const [error, setError] = useState(null);
 
   const handleRegister = () => {
-    let userId;
+    // let userId;
     setError(null);
     setLoading(true);
-    if (confirmPassword.value != password.value) {
+    if (confirmPassword.value !== password.value) {
+      setLoading(false);
       setError("Passwords don't match");
+      return;
+    }
+    var pattern=new RegExp("[A-Za-z]+$");
+    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
+      setLoading(false);
+      setError("Names cannot contains numbers");
       return;
     }
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
@@ -72,29 +81,34 @@ function Register(props) {
 
   return (
     <div id="centered">
-      <h3>Register</h3><br /><br />
-      <div>
-        Username<br />
-        <input type="text" {...username} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
+      <div className="user-register-forms">
+        <div className="user-register-form">
+          <Paper style={{ backgroundColor: "#ffd400", textAlign: "center", padding: ".3rem", marginBottom: ".3rem", }}>
+            <h3>Register</h3>
+          </Paper>
+          <Paper style={{ backgroundColor: "#7bb2d9", textAlign: "center", padding: "1rem", }} >
+            <div id="user-edit-field">
+              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Username" {...username} minLength='1' maxLength='20'></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="First Name" {...firstname} minLength='1' maxLength='20' ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Last Name" {...lastname} minLength='1' maxLength='20' ></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField id="user-edit-field" type="password" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Password" {...password} minLength='1' maxLength='20'></TextField>
+            </div>
+            <div id="user-edit-field">
+              <TextField type="password" id="user-edit-field" autoComplete="new-password" variant="outlined" onKeyDown={handleEnterButton} label="Confirm Password" {...confirmPassword} minLength='1' maxLength='20' ></TextField>
+            </div>
+            {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
+            <div id="user-edit-field">
+              <PrimaryButton value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading}>Register</PrimaryButton>
+            </div>
+          </Paper>
+        </div>
       </div>
-      <div>
-        Firstname<br />
-        <input type="text" {...firstname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
-      </div>
-      <div>
-        Lastname<br />
-        <input type="text" {...lastname} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
-      </div>
-      <div style={{ marginTop: 10 }}>
-        Password<br />
-        <input type="password" {...password} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20' />
-      </div>
-      <div style={{ marginTop: 10 }}>
-        Confirm Password<br />
-        <input type="password" {...confirmPassword} autoComplete="new-password" class="form-control" onKeyDown={handleEnterButton} minLength='1' maxLength='20'/>
-      </div>
-      {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
-      <input type="button" class="btn btn-primary" value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading} /><br />
     </div>
   );
 }

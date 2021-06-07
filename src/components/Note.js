@@ -1,6 +1,7 @@
 import { Accordion } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
-import {LocalConvenienceStoreOutlined, PriorityHigh} from '@material-ui/icons'
+import {PriorityHigh} from '@material-ui/icons'
+// import {LocalConvenienceStoreOutlined} from '@material-ui/icons'
 import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -28,7 +29,7 @@ let notification = {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    background: "#7bb2d9",
+    background: "#b3b8bc",
     width: "50%",
   },
   heading: {
@@ -54,33 +55,27 @@ const StyledRating = withStyles({
 let Note = (props) => {
   const classes = useStyles();
   let dataOd = new Date(props.dataOd).toLocaleDateString();
-  let dataDo = new Date(props.dataOd).toLocaleDateString();
+  let dataDo = new Date(props.dataDo).toLocaleDateString();
   let godzOd = new Date(props.dataOd).toLocaleTimeString();
-  let godzDo = new Date(props.dataOd).toLocaleTimeString();
+  let godzDo = new Date(props.dataDo).toLocaleTimeString();
   const [expanded, setExpanded] = React.useState(false);
+  const [isLoading,setLoading] = React.useState(false)
+
+  
+  // eslint-disable-next-line no-unused-vars
   const [value, setValue] = React.useState(2);
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  let deleteNote = (id) =>{
-
-    axios.delete('http://localhost:8002/notes/'+id).then(
-      (resp)=>{store.addNotification({
-        notification,
-        title: "Success!",
-        message: "Succesfully deleted a note.",
-        type: "success",
-      });
-    }
-  ).catch((err)=>{
-    console.log("Can't delete a note",err)
-  })
-  
-  }
-
   let id = props.id;
+
+  if(isLoading){
+    return(
+      <div>Loading...</div>
+    )
+  }
 
   return (
     <Accordion
@@ -113,8 +108,8 @@ let Note = (props) => {
             </StyledRating>
         </div>
         <div style={{display:"flex",justifyContent:"space-between"}}>
-        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Edit</PrimaryButton>
-        <SecondaryButton onClick={()=>deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
+        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}} onClick={()=>props.editNote(props)}>Edit</PrimaryButton>
+        <SecondaryButton onClick={()=>props.deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
         </div>
       </AccordionDetails>
     </Accordion>

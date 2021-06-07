@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
+import { FormControlLabel, TextField } from "@material-ui/core";
+import { TextFormatRounded } from "@material-ui/icons";
+import { PrimaryButton, SecondaryButton } from "./Buttons";
 
 export default function Table({ columns, data }) {
   const [filterInput, setFilterInput] = useState("");
@@ -27,12 +30,16 @@ export default function Table({ columns, data }) {
 
   return (
     <>
-      <input
+      <div className="Aux-btn">
+      <TextField
         value={filterInput}
         onChange={handleFilterChange}
         placeholder={"Search name"}
-        class="form-control mr-sm-2 mb-3" type="search" aria-label="Search"
+        type="search" label="Search"
+        variant="filled"
+        className="SearchBar"
       />
+      </div>
       <table class="table" {...getTableProps()}>
         <thead>
           {headerGroups.map(headerGroup => (

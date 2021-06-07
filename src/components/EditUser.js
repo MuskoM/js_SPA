@@ -11,6 +11,7 @@ function EditUser(props) {
   const lastname = useFormInput("");
   const confirmPassword = useFormInput("");
   const oldPassword = useFormInput("");
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const notification = {
     title: "Test notification",
@@ -29,7 +30,7 @@ function EditUser(props) {
   const handleUpdate = () => {
     setError(null);
     setLoading(true);
-    if (firstname.value == undefined || lastname.value == undefined) {
+    if (firstname.value === undefined || lastname.value === undefined) {
       setLoading(false);
       setError("Name cannot be empty");
       store.addNotification({
@@ -71,7 +72,7 @@ function EditUser(props) {
   const handleCredentialsUpdate = () => {
     setError(null);
     setLoading(true);
-    if (confirmPassword.value != password.value) {
+    if (confirmPassword.value !== password.value) {
       setError("Passwords don't match");
       store.addNotification({
         ...notification,
@@ -80,6 +81,12 @@ function EditUser(props) {
         type: "danger",
       });
       setLoading(false);
+      return;
+    }
+    var pattern=new RegExp("[A-Za-z]+$");
+    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
+      setLoading(false);
+      setError("Names cannot contains numbers");
       return;
     }
     var user = JSON.parse(sessionStorage.user);
@@ -163,7 +170,7 @@ function EditUser(props) {
           </Paper>
           <Paper
             style={{
-              backgroundColor: "#7bb2d9",
+              backgroundColor: "#e9ebec",
               textAlign: "center",
               padding: "1rem",
             }}
@@ -214,7 +221,7 @@ function EditUser(props) {
           </Paper>
           <Paper
             style={{
-              backgroundColor: "#7bb2d9",
+              backgroundColor: "#e9ebec",
               textAlign: "center",
               padding: "1rem",
             }}
@@ -225,6 +232,7 @@ function EditUser(props) {
                 variant="outlined"
                 {...oldPassword}
                 onKeyDown={handleEnterButton}
+                type="password"
                 label="Old Password"
               ></TextField>
             </div>
@@ -234,6 +242,7 @@ function EditUser(props) {
                 variant="outlined"
                 onKeyDown={handleEnterButton}
                 label="New Password"
+                type="password"
                 {...password}
               ></TextField>
             </div>
@@ -243,6 +252,7 @@ function EditUser(props) {
                 variant="outlined"
                 onKeyDown={handleEnterButton}
                 label="Confirm Password"
+                type="password"
                 {...confirmPassword}
               ></TextField>
             </div>
