@@ -199,7 +199,7 @@ class NotesList extends Component {
               ></Note>
             );
           })}
-          <Modal type={false} show={this.state.show} addNote={this.submitEventData} editNote={this.editNoteData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
+          <Modal show={this.state.show} addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
           <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
             <AddIcon />
             Add
