@@ -30,7 +30,7 @@ function EditUser(props) {
   const handleUpdate = () => {
     setError(null);
     setLoading(true);
-    console.log("update - before first if");
+
     if (firstname.value === "" || lastname.value === "") {
       setLoading(false);
       store.addNotification({
@@ -41,6 +41,7 @@ function EditUser(props) {
       });
       return;
     }
+
     var pattern=new RegExp("[A-Za-z]+$");
     if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
       setLoading(false);
@@ -59,6 +60,7 @@ function EditUser(props) {
       })
       .then((response) => {
         setLoading(false);
+
         store.addNotification({
           ...notification,
           title: "Success!",
@@ -78,11 +80,8 @@ function EditUser(props) {
   };
 
   const handleCredentialsUpdate = () => {
-    setError(null);
     setLoading(true);
-    console.log("credentials - before first if");
     if (confirmPassword.value !== password.value) {
-      setError("Passwords don't match");
       store.addNotification({
         ...notification,
         title: "Error!",
@@ -90,12 +89,6 @@ function EditUser(props) {
         type: "danger",
       });
       setLoading(false);
-      return;
-    }
-    var pattern=new RegExp("[A-Za-z]+$");
-    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
-      setLoading(false);
-      setError("Names cannot contains numbers");
       return;
     }
     var user = JSON.parse(sessionStorage.user);

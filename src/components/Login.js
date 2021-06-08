@@ -28,7 +28,7 @@ function Login(props) {
       .catch((error) => {
         setLoading(false);
         if (error.response.status !== 401 && error.response.status !== 400) {
-          setError("Something went wrong. Please try again later.");
+          setError("Invalid password or login");
           return;
         }
         console.log(error.response.data.errorKey);
@@ -40,7 +40,7 @@ function Login(props) {
             setError("Invalid password or login");
             break;
           default:
-            setError("Something went wrong. Please try again later.");
+            setError("Invalid password or login.");
             break;
         }
       });

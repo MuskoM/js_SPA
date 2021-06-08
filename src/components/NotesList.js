@@ -143,9 +143,6 @@ class NotesList extends Component {
       return <div></div>;
     }
 
-    const categories = this.state.categories;
-    console.log("Kategorie", categories);
-
     const sortList = [
       { id: 1, name: "dataOd - rosnąco" },
       { id: 2, name: "dataOd - malejąco" },
@@ -202,107 +199,7 @@ class NotesList extends Component {
               ></Note>
             );
           })}
-
-          {/* <div className="modal" id="addEventModal">
-            <div className="modal-content" id="addEventModalContent">
-              <div className="modal-element">
-                <TextField
-                  variant="outlined"
-                  id="dataOd"
-                  classes={{ root: "modal-element-label" }}
-                  label="Data od"
-                  defaultValue={add(new Date(), { hours: 2 }).toISOString().slice(0, -8)}
-                  type="datetime-local"
-                  onChange={(e) => {
-                    this.setState({ start: e.target.value });
-                  }}
-                ></TextField>
-              </div>
-              <div className="modal-element">
-                <TextField
-                  variant="outlined"
-                  id="dataDo"
-                  label="Data do"
-                  defaultValue={add(new Date(), { hours: 3 }).toISOString().slice(0, -8)}
-                  type="datetime-local"
-                  onChange={(e) => {
-                    this.setState({ end: e.target.value });
-                  }}
-                ></TextField>
-              </div>
-              <div className="modal-element">
-                <TextField
-                  variant="outlined"
-                  id="title"
-                  label="Tytuł"
-                  type="text"
-                  onChange={(e) => {
-                    this.setState({ title: e.target.value });
-                  }}
-                ></TextField>
-              </div>
-              <div className="modal-element">
-                <TextField
-                  variant="outlined"
-                  id="noteBody"
-                  label="Notatka"
-                  multiline={true}
-                  rows={4}
-                  onChange={(e) => {
-                    this.setState({ noteBody: e.target.value });
-                  }}
-                ></TextField>
-              </div>
-              <div
-                className="modal-element"
-                style={{
-                  border: " 0.5px solid rgba(0,0,0,.2)",
-                  borderRadius: ".3rem",
-                  marginTop: "1rem",
-                  marginBottom: "1rem",
-                  paddingLeft: "0.5rem",
-                  width: "30%",
-                }}
-              >
-                <label>Priority</label>
-                <br></br>
-                <Rating
-                  id="prioritySelector"
-                  max={3}
-                  classes={{ iconFilled: "priority-icon-filled" }}
-                  defaultValue={2}
-                  name="priority"
-                  icon={<PriorityHigh fontSize="inherit" />}
-                  onChange={(e) => {
-                    this.setState({ priority: e.target.value });
-                  }}
-                ></Rating>
-              </div>
-              <div className="modal-element">
-                <TextField label="Kategoria" value={this.state.selectedCategory} variant="outlined" select onChange={(e) => {
-                  this.setState({ selectedCategory: e.target.value })
-                }}>
-                  
-                </TextField>
-              </div>
-
-              <div style={{ paddingBottom: "1rem" }}>
-                <PrimaryButton onClick={this.submitEventData}>
-                  Submit
-                </PrimaryButton>
-              </div>
-              <div>
-                <SecondaryButton
-                  onClick={() => {
-                    this.hideModal("addEventModal");
-                  }}
-                >
-                  Close
-                </SecondaryButton>
-              </div>
-            </div>
-          </div> */}
-          <Modal show={this.state.show} addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
+          <Modal type={false} show={this.state.show} addNote={this.submitEventData} editNote={this.editNoteData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
           <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
             <AddIcon />
             Add
@@ -389,16 +286,16 @@ class NotesList extends Component {
     }
   }
 
-  editNoteData = () => {
+  editNoteData = (data) => {
 
     var user = JSON.parse(sessionStorage.user);
 
     let newNote = {
-      title: this.state.title,
-      start: this.state.start,
-      end: this.state.end,
-      noteBody: this.state.noteBody,
-      priority: this.state.priority,
+      title: data.title,
+      start: data.start,
+      end: data.end,
+      noteBody: data.noteBody,
+      priority: data.priority,
       user: parseInt(user.userId)
     }
 
@@ -427,9 +324,6 @@ class NotesList extends Component {
   }
 
   submitEventData = (data) => {
-
-    console.log("Adding")
-    console.log(data)
 
     var user = JSON.parse(sessionStorage.user);
 

@@ -11,6 +11,7 @@ let Modal = (props) =>{
 
     console.log(props)
     const showHideClassName = props.show ? "modal display-block" : "modal display-none";
+    const submitFunction = props.type ? props.addNote : props.editNote;
     let c = props.categories[0].name
     let [selectedCategory,setSelectedCategory] = useState(c)
     let [title,setTitle] = useState()
@@ -108,7 +109,7 @@ let Modal = (props) =>{
           </div>
 
           <div style={{ paddingBottom: "1rem" }}>
-            <PrimaryButton onClick={()=>{props.addNote({
+            <PrimaryButton onClick={()=>{submitFunction({
                 title: title,
                 start: start,
                 end: end,
