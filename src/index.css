@@ -131,6 +131,14 @@ code {
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+.display-block {
+  display: block;
+}
+
+.display-none {
+  display: none;
+}
+
 /* Modal Content */
 .modal-content {
   background-color: #e9ebec;
@@ -190,6 +198,11 @@ code {
   padding: .4rem;
 }
 
+.notePriority{
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
 
 
 /*User edit panel*/

@@ -7,9 +7,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import Typography from "@material-ui/core/Typography";
+import Chip from "@material-ui/core/Chip";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
 import PrimaryButton, { SecondaryButton } from "./Buttons";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,7 +46,15 @@ let Note = (props) => {
   let godzDo = new Date(props.dataDo).toLocaleTimeString();
   const [expanded, setExpanded] = React.useState(false);
   const [isLoading,setLoading] = React.useState(false)
+  const [category,setCategory] = React.useState();
 
+  axios.get("http://localhost:8002/categories/"+props.category).then(
+    (resp) => {
+      setCategory(resp.data.name)
+    }
+  ).catch(
+    (err) => {console.log("Category not fetched in Note" + err) }
+  )
   
   // eslint-disable-next-line no-unused-vars
   const [value, setValue] = React.useState(2);
@@ -81,7 +91,8 @@ let Note = (props) => {
         <div id="body">
           <Typography>{props.body}</Typography>
         </div>
-        <div id="notePriority"style={{alignSelf:"flex-end"}}>
+        <div className="notePriority">
+            <div>
             <StyledRating
             name="priority"
             value={props.priority}
@@ -90,6 +101,10 @@ let Note = (props) => {
             max={3}
             >
             </StyledRating>
+            </div>
+            <div>
+            <Chip style={{marginBottom:"1rem",marginLeft:".4rem"}} label={category}></Chip>
+            </div>
         </div>
         <div style={{display:"flex",justifyContent:"space-between"}}>
         <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}} onClick={()=>props.editNote(props)}>Edit</PrimaryButton>

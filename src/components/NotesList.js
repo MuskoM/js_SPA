@@ -8,6 +8,7 @@ import { PrimaryButton, SecondaryButton } from "./Buttons";
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import EventPopup from "./EventPopup";
+import Modal from './Modal';
 import {
   TextField, MenuItem
 } from "@material-ui/core";
@@ -20,6 +21,7 @@ class NotesList extends Component {
       isLoading: true,
       notesList: undefined,
       fullList: undefined,
+      show:false,
       start: add(new Date(), { hours: 2 }).toISOString().slice(0, -8),
       end: add(new Date(), { hours: 3 }).toISOString().slice(0, -8),
       filter: "",
@@ -27,6 +29,8 @@ class NotesList extends Component {
       categories: undefined,
       selectedCategory: undefined,
     };
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
   }
 
   notification = {
@@ -56,8 +60,7 @@ class NotesList extends Component {
   };
 
   componentDidMount = () => {
-    this.getData();
-    
+    this.getData();   
   };
 
   editNote = (note) => {
@@ -112,10 +115,8 @@ class NotesList extends Component {
       .then((response) => {
         let list = response.data;
         var user = JSON.parse(sessionStorage.user);
-
         list = list.filter(n => n.user == user.userId);
         this.setState({ notesList: list, fullList: list });
-        this.setState({ isLoading: false });
         return list;
       })
       .catch((error) => {
@@ -131,7 +132,6 @@ class NotesList extends Component {
       .catch((error) => {
         console.log(error);
       });
-
   }
 
   render() {
@@ -196,13 +196,14 @@ class NotesList extends Component {
                 priority={note.priority}
                 dataOd={note.start}
                 dataDo={note.end}
+                category={note.category}
                 deleteNote={this.deleteNote}
                 editNote={this.editNote}
               ></Note>
             );
           })}
 
-          <div className="modal" id="addEventModal">
+          {/* <div className="modal" id="addEventModal">
             <div className="modal-content" id="addEventModalContent">
               <div className="modal-element">
                 <TextField
@@ -277,6 +278,13 @@ class NotesList extends Component {
                   }}
                 ></Rating>
               </div>
+              <div className="modal-element">
+                <TextField label="Kategoria" value={this.state.selectedCategory} variant="outlined" select onChange={(e) => {
+                  this.setState({ selectedCategory: e.target.value })
+                }}>
+                  
+                </TextField>
+              </div>
 
               <div style={{ paddingBottom: "1rem" }}>
                 <PrimaryButton onClick={this.submitEventData}>
@@ -293,7 +301,8 @@ class NotesList extends Component {
                 </SecondaryButton>
               </div>
             </div>
-          </div>
+          </div> */}
+          <Modal show={this.state.show} addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
           <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
             <AddIcon />
             Add
@@ -303,14 +312,17 @@ class NotesList extends Component {
     }
   }
 
+
   showModal = (name) => {
-    var modal = document.getElementById(name);
-    modal.style.display = "block";
+    // var modal = document.getElementById(name);
+    // modal.style.display = "block";
+    this.setState({show:true})
   };
 
   hideModal = (name) => {
-    let modal = document.getElementById(name);
-    modal.style.display = "none";
+    // let modal = document.getElementById(name);
+    // modal.style.display = "none";
+    this.setState({show:false})
   };
 
   updateFilter = (e) => {
@@ -379,12 +391,15 @@ class NotesList extends Component {
 
   editNoteData = () => {
 
+    var user = JSON.parse(sessionStorage.user);
+
     let newNote = {
       title: this.state.title,
       start: this.state.start,
       end: this.state.end,
       noteBody: this.state.noteBody,
-      priority: this.state.priority
+      priority: this.state.priority,
+      user: parseInt(user.userId)
     }
 
     console.log("Note edited", newNote)
@@ -411,15 +426,21 @@ class NotesList extends Component {
     );
   }
 
-  submitEventData = () => {
+  submitEventData = (data) => {
+
+    console.log("Adding")
+    console.log(data)
+
+    var user = JSON.parse(sessionStorage.user);
 
     let newNote = {
-      title: this.state.title,
-      start: this.state.start,
-      end: this.state.end,
-      noteBody: this.state.noteBody,
-      priority: this.state.priority,
-      category: this.state.selectedCategory
+      title: data.title,
+      start: data.start,
+      end: data.end,
+      noteBody: data.noteBody,
+      priority: data.priority,
+      category: data.category,
+      user: parseInt(user.userId)
     }
 
     console.log("Note added", newNote)

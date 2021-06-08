@@ -30,9 +30,9 @@ function EditUser(props) {
   const handleUpdate = () => {
     setError(null);
     setLoading(true);
-    if (firstname.value === undefined || lastname.value === undefined) {
+    console.log("update - before first if");
+    if (firstname.value === "" || lastname.value === "") {
       setLoading(false);
-      setError("Name cannot be empty");
       store.addNotification({
         ...notification,
         title: "Error!",
@@ -41,7 +41,17 @@ function EditUser(props) {
       });
       return;
     }
-
+    var pattern=new RegExp("[A-Za-z]+$");
+    if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
+      setLoading(false);
+      store.addNotification({
+        ...notification,
+        title: "Error!",
+        message: "Names cannot contains numbers",
+        type: "danger",
+      });
+      return;
+    }
     axios
       .put("http://localhost:8002/users/" + user.userId, {
         firstname: firstname.value,
@@ -49,7 +59,6 @@ function EditUser(props) {
       })
       .then((response) => {
         setLoading(false);
-        setError("Name changes saved successfully.");
         store.addNotification({
           ...notification,
           title: "Success!",
@@ -59,7 +68,6 @@ function EditUser(props) {
       })
       .catch((error) => {
         setLoading(false);
-        setError("Something went wrong. Please try again later.");
         store.addNotification({
           ...notification,
           title: "Error!",
@@ -72,6 +80,7 @@ function EditUser(props) {
   const handleCredentialsUpdate = () => {
     setError(null);
     setLoading(true);
+    console.log("credentials - before first if");
     if (confirmPassword.value !== password.value) {
       setError("Passwords don't match");
       store.addNotification({
@@ -146,8 +155,6 @@ function EditUser(props) {
     }
   };
   var user = JSON.parse(sessionStorage.user);
-
-  console.log(user);
 
   return (
     <div className="edit-panel">

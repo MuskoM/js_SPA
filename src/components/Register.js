@@ -22,6 +22,11 @@ function Register(props) {
       setError("Passwords don't match");
       return;
     }
+    if (firstname.value === "" || lastname.value === "") {
+      setLoading(false);
+      setError("Name cannot be empty");
+      return;
+    }
     var pattern=new RegExp("[A-Za-z]+$");
     if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
       setLoading(false);

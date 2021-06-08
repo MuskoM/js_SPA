@@ -31,6 +31,10 @@ class Categories extends React.Component {
   };
 
   createCategory = () => {
+    var name = document.getElementById("nameCreate");
+    var description = document.getElementById("descriptionCreate");
+    name.value = "";
+    description.value = "";
     this.showCategoryModal("createCategoryModal");
   };
 
@@ -38,8 +42,8 @@ class Categories extends React.Component {
     var category = row.values;
     var name = document.getElementById("nameEdit");
     var description = document.getElementById("descriptionEdit");
-    name.placeholder = category.name;
-    description.placeholder = category.description;
+    name.value = category.name;
+    description.value = category.description;
     this.setState({ currentCategory: category });
 
     this.showCategoryModal("editCategoryModal");
@@ -87,6 +91,16 @@ class Categories extends React.Component {
     var name = document.getElementById("nameEdit");
     var description = document.getElementById("descriptionEdit");
     var category = { name: name.value, description: description.value };
+    console.log(name.value);
+    if (name.value === ""){
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: "Name cannot be empty!",
+        type: "danger",
+      });
+      return;
+    }
     axios
       .put(
         "http://localhost:8002/categories/" + this.state.currentCategory.id,
@@ -119,6 +133,15 @@ class Categories extends React.Component {
     var name = document.getElementById("nameCreate");
     var description = document.getElementById("descriptionCreate");
     var category = { name: name.value, description: description.value };
+    if (name.value === ""){
+      store.addNotification({
+        ...this.notification,
+        title: "Error!",
+        message: "Name cannot be empty!",
+        type: "danger",
+      });
+      return;
+    }
     axios
       .post("http://localhost:8002/categories", {
         name: category.name,
