@@ -252,7 +252,7 @@ app.post("/categories", (req, res) => {
             return;
         }
         var data = JSON.parse(dataJson);
-        var category = data.Categories.find((c) => c.id == req.body.id || c.name == req.body.name);
+        var category = data.Categories.find((c) => c.id == req.body.id || c.name.toLowerCase() == req.body.name.toLowerCase());
         if (category) {
             console.log(`Category with id = ${req.body.id} already exists`);
             return res
@@ -300,7 +300,7 @@ app.put("/categories/:id", (req, res) => {
                 .send(`Category with id = ${categoryBody.id} already exists`);
             return;
         }
-        var category = data.Categories.find((c) => c.id == req.params.id || c.name == req.body.name);
+        var category = data.Categories.find((c) => c.id == req.params.id || c.name.toLowerCase() == req.body.name.toLowerCase());
         if (!category) {
             data.Categories.push(req.body);
             var newList = JSON.stringify(data);

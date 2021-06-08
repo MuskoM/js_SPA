@@ -147,6 +147,13 @@ function EditUser(props) {
       handleUpdate();
     }
   };
+
+  const handleCredentialsEnterButton = (event) => {
+    if (event.key === "Enter") {
+      handleCredentialsUpdate();
+    }
+  }
+
   var user = JSON.parse(sessionStorage.user);
 
   return (
@@ -231,7 +238,7 @@ function EditUser(props) {
                 id="user-edit-field"
                 variant="outlined"
                 {...oldPassword}
-                onKeyDown={handleEnterButton}
+                onKeyDown={handleCredentialsEnterButton}
                 type="password"
                 label="Old Password"
               ></TextField>
@@ -240,7 +247,7 @@ function EditUser(props) {
               <TextField
                 id="user-edit-field"
                 variant="outlined"
-                onKeyDown={handleEnterButton}
+                onKeyDown={handleCredentialsEnterButton}
                 label="New Password"
                 type="password"
                 {...password}
@@ -250,7 +257,7 @@ function EditUser(props) {
               <TextField
                 id="user-edit-field"
                 variant="outlined"
-                onKeyDown={handleEnterButton}
+                onKeyDown={handleCredentialsEnterButton}
                 label="Confirm Password"
                 type="password"
                 {...confirmPassword}

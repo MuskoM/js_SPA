@@ -309,14 +309,14 @@ class Categories extends React.Component {
                 id="descriptionCreate"
               ></TextField>
             </div>
-            <div className="modal-element">
+            {/* <div className="modal-element">
               <ColorPicker
                 name="color"
                 defaultValue="#000"
                 value={this.state.color}
                 onChange={(color) => this.setState({color:color})}
               />
-            </div>
+            </div> */}
             <SecondaryButton onClick={() => this.saveCreate()}>
               Submit
             </SecondaryButton>

@@ -6,18 +6,20 @@ import add from "date-fns/add"
 import {Rating} from '@material-ui/lab'
 import { PrimaryButton, SecondaryButton } from "./Buttons";
 import { PriorityHigh } from "@material-ui/icons";
+import { id } from 'date-fns/locale';
 
 let Modal = (props) =>{
 
     console.log(props)
     const showHideClassName = props.show ? "modal display-block" : "modal display-none";
+    const submitFunc = props.edit ? props.editNote : props.addNote;
     let c = props.categories[0].id
     let [selectedCategory,setSelectedCategory] = useState(c)
-    let [title,setTitle] = useState()
-    let [body,setBody] = useState()
+    let [title,setTitle] = useState(props.title)
+    let [body,setBody] = useState(props.body)
     let [start,setStart] = useState(add(new Date(), { hours: 2 }).toISOString().slice(0, -8))
     let [end,setEnd] = useState(add(new Date(), { hours: 3 }).toISOString().slice(0, -8))
-    let [priority,setPriority] = useState()
+    let [priority,setPriority] = useState(props.priority)
     
     return(
         <div className={showHideClassName} id="addEventModal">
@@ -52,6 +54,7 @@ let Modal = (props) =>{
               variant="outlined"
               id="title"
               label="Tytuł"
+              value={title}
               type="text"
               onChange={(e) => {
                 setTitle(e.target.value)
@@ -62,6 +65,7 @@ let Modal = (props) =>{
             <TextField
               variant="outlined"
               id="noteBody"
+              value={body}
               label="Notatka"
               multiline={true}
               rows={4}
@@ -87,7 +91,8 @@ let Modal = (props) =>{
               id="prioritySelector"
               max={3}
               classes={{ iconFilled: "priority-icon-filled" }}
-              defaultValue={2}
+              defaultValue="2"
+              value={priority}
               name="priority"
               icon={<PriorityHigh fontSize="inherit" />}
               onChange={(e) => {
@@ -107,7 +112,8 @@ let Modal = (props) =>{
           </div>
 
           <div style={{ paddingBottom: "1rem" }}>
-            <PrimaryButton onClick={()=>{props.addNote({
+            <PrimaryButton onClick={()=>{submitFunc({
+                id:props.id,
                 title: title,
                 start: start,
                 end: end,

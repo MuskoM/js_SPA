@@ -12,6 +12,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
 import PrimaryButton, { SecondaryButton } from "./Buttons";
 import axios from "axios";
+import Modal from './Modal';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,6 +46,7 @@ let Note = (props) => {
   let godzOd = new Date(props.dataOd).toLocaleTimeString();
   let godzDo = new Date(props.dataDo).toLocaleTimeString();
   const [expanded, setExpanded] = React.useState(false);
+  const [isShown, setShown] = React.useState(false);
   const [isLoading,setLoading] = React.useState(false)
   const [category,setCategory] = React.useState();
 
@@ -82,7 +84,7 @@ let Note = (props) => {
         aria-controls="panel1bh-content"
         id="panel1bh-header"
       >
-        <Typography className={classes.heading}>{props.title} {props.id}</Typography>
+        <Typography className={classes.heading}>{props.title}</Typography>
         <Typography className={classes.secondaryHeading}>
           Od: {dataOd},{godzOd} Do: {dataDo},{godzDo}{" "}
         </Typography>
@@ -107,10 +109,11 @@ let Note = (props) => {
             </div>
         </div>
         <div style={{display:"flex",justifyContent:"space-between"}}>
-        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}} onClick={()=>props.editNote(props)}>Edit</PrimaryButton>
+        <PrimaryButton style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}} onClick={()=>{setShown(true)}}>Edit</PrimaryButton>
         <SecondaryButton onClick={()=>props.deleteNote(id)} style={{width:'30%',marginTop:"1rem",marginBottom:"1rem"}}>Delete</SecondaryButton>
         </div>
       </AccordionDetails>
+      <Modal show={isShown} id={props.id} title={props.title} body={props.body} edit={true} priority={props.priority} editNote={props.editNote} closeModal={()=>{setShown(false)}} categories={props.categories} ></Modal>
     </Accordion>
   );
 };

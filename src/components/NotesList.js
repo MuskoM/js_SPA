@@ -73,16 +73,18 @@ class NotesList extends Component {
   };
 
   editNote = (note) => {
-
+    console.log("Edit")
+    console.log(note)
     var user = JSON.parse(sessionStorage.user);
 
     let newNote = {
       id: note.id,
       title: note.title,
-      start: note.dataOd,
-      end: note.dataDo,
-      noteBody: note.body + "Edited",
+      start: note.start,
+      end: note.end,
+      noteBody: note.noteBody,
       priority: note.priority,
+      category:note.category,
       user: parseInt(user.userId)
     }
 
@@ -94,7 +96,9 @@ class NotesList extends Component {
           message: "Succesfully updated a note.",
           type: "success",
         });
+        console.log("Edited")
         this.getData();
+        this.hideModal();
       }
     ).catch((err) => {
       console.log("Can't delete a note", err)
@@ -133,9 +137,8 @@ class NotesList extends Component {
       })
       .catch((error) => {
         console.log(error);
+        return [];
       });
-
-      
   }
 
   render() {
@@ -155,7 +158,7 @@ class NotesList extends Component {
       { id: 5, name: "tytuł - rosnąco" },
       { id: 6, name: "tytuł - malejąco" }];
 
-    if (notesList.length === 0) {
+    if (notesList === undefined || notesList.length === 0) {
       return (
         <div className="NotesList">
           <div className="FilterBar">
@@ -213,10 +216,11 @@ class NotesList extends Component {
                 category={note.category}
                 deleteNote={this.deleteNote}
                 editNote={this.editNote}
+                categories={this.state.categories}
               ></Note>
             );
           })}
-          <Modal show={this.state.show} addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
+          <Modal show={this.state.show} priority="2" addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
           <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
             <AddIcon />
             Add
@@ -305,46 +309,11 @@ class NotesList extends Component {
     }
   }
 
-  editNoteData = (data) => {
-
-    var user = JSON.parse(sessionStorage.user);
-
-    let newNote = {
-      title: data.title,
-      start: data.start,
-      end: data.end,
-      noteBody: data.noteBody,
-      priority: data.priority,
-      user: parseInt(user.userId)
-    }
-
-    console.log("Note edited", newNote)
-
-    axios.put('http://localhost:8002/notes/', newNote).then(
-      (resp) => {
-        store.addNotification({
-          ...this.notification,
-          title: "Success!",
-          message: "Added a note!",
-          type: "success",
-        });
-      }
-    ).catch((err) => {
-      console.log("Sending a note was unsucessful", err)
-    })
-
-    this.hideModal('addEventModal')
-
-    return (
-      <div>
-        <EventPopup />
-      </div>
-    );
-  }
-
   submitEventData = (data) => {
 
     var user = JSON.parse(sessionStorage.user);
+
+    console.log("ass",data)
 
     let newNote = {
       title: data.title,
