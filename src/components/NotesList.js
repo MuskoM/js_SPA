@@ -57,15 +57,7 @@ class NotesList extends Component {
 
   componentDidMount = () => {
     this.getData();
-    axios
-      .get(`http://localhost:8002/categories`)
-      .then((response) => {
-        let list = response.data;
-        this.setState({ categories: list, isLoading: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    
   };
 
   editNote = (note) => {
@@ -125,6 +117,16 @@ class NotesList extends Component {
         this.setState({ notesList: list, fullList: list });
         this.setState({ isLoading: false });
         return list;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      axios
+      .get(`http://localhost:8002/categories`)
+      .then((response) => {
+        let list = response.data;
+        this.setState({ categories: list, isLoading: false });
       })
       .catch((error) => {
         console.log(error);

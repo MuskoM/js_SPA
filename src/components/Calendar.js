@@ -12,6 +12,7 @@ import { PrimaryButton, SecondaryButton } from "./Buttons";
 import EventPopup from "./EventPopup";
 import { Select, TextField, MenuItem } from "@material-ui/core";
 import { store } from "react-notifications-component";
+import { Tooltip } from "bootstrap";
 
 class DayGridCalendar extends React.Component { }
 
@@ -60,6 +61,7 @@ class WeeklyCalendar extends React.Component {
           timeZone="Europe/Warsaw"
           plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
+          eventDidMount={this.eventDidMount}
           eventSources={[
             {
               id: 1,
@@ -202,6 +204,15 @@ class WeeklyCalendar extends React.Component {
         </PrimaryButton>
       </div>
     );
+  }
+
+  eventDidMount = (info)=>{
+    console.log(info)
+    let tooltip = new Tooltip(info.el,
+      {title: info.event.extendedProps.noteBody,
+        placement: 'top',
+        trigger: 'hover',
+        container: 'body'})
   }
 
   componentDidMount = () => {

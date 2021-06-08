@@ -10,22 +10,6 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
 import PrimaryButton, { SecondaryButton } from "./Buttons";
-import axios from "axios";
-import { store } from "react-notifications-component";
-
-let notification = {
-  title: "Test notification",
-  message: "You shouldn't see it here.",
-  type: "success",
-  insert: "bottom",
-  container: "bottom-right",
-  animationIn: ["animate__animated", "animate__fadeIn"],
-  animationOut: ["animate__animated", "animate__fadeOut"],
-  dismiss: {
-    duration: 5000,
-    onScreen: true,
-  },
-};
 
 const useStyles = makeStyles((theme) => ({
   root: {
