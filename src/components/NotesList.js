@@ -60,10 +60,21 @@ class NotesList extends Component {
   };
 
   componentDidMount = () => {
-    this.getData();   
+    this.getData();  
+    axios
+      .get(`http://localhost:8002/categories`)
+      .then((response) => {
+        let list = response.data;
+        this.setState({ categories: list, isLoading: false });
+      })
+      .catch((error) => {
+        console.log(error);
+      }); 
   };
 
   editNote = (note) => {
+
+    var user = JSON.parse(sessionStorage.user);
 
     let newNote = {
       id: note.id,
@@ -71,7 +82,8 @@ class NotesList extends Component {
       start: note.dataOd,
       end: note.dataDo,
       noteBody: note.body + "Edited",
-      priority: note.priority
+      priority: note.priority,
+      user: parseInt(user.userId)
     }
 
     axios.put('http://localhost:8002/notes/' + note.id, newNote).then(
@@ -123,15 +135,7 @@ class NotesList extends Component {
         console.log(error);
       });
 
-      axios
-      .get(`http://localhost:8002/categories`)
-      .then((response) => {
-        let list = response.data;
-        this.setState({ categories: list, isLoading: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      
   }
 
   render() {
@@ -154,15 +158,28 @@ class NotesList extends Component {
     if (notesList.length === 0) {
       return (
         <div className="NotesList">
-          <TextField
-            value={this.state.filter}
-            variant="outlined"
-            label="Search"
-            onChange={this.handleFilterChange}
-            type="search" aria-label="Search"
-            className="SearchBar"
-          ></TextField>
+          <div className="FilterBar">
+            <TextField
+              variant="filled"
+              value={this.state.filter}
+              label="Search"
+              onChange={this.handleFilterChange}
+              type="search" aria-label="Search"
+              className="SearchBar"
+            />
+            <TextField label="sort" className="SearchBar" value={this.state.sort} variant="filled" select onChange={this.handleSorting}>
+              {sortList.map((option, i) => {
+                return (<MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>)
+              })}
+
+            </TextField>
+          </div>
           <h3>No notes to view</h3>
+          <Fab onClick={() => this.showModal("addEventModal")} variant="extended" style={{ margin: '1rem', backgroundColor: "#ffd400" }}>
+            <AddIcon />
+            Add
+          </Fab>
+          <Modal show={this.state.show} addNote={this.submitEventData} closeModal={this.hideModal} categories={this.state.categories} ></Modal>
         </div>
       );
     } else {
@@ -230,6 +247,8 @@ class NotesList extends Component {
     console.log("Filter changed", e.target.value);
     let list = this.state.fullList.filter(n => n.title.includes(e.target.value));
     console.log("list", list);
+    this.setState({isLoading: false})
+
     this.setState({ filter: e.target.value, notesList: list });
   };
 
@@ -347,7 +366,9 @@ class NotesList extends Component {
           message: "Added a note!",
           type: "success",
         });
-        this.setState({ isLoading: true });
+        let list = this.getData();
+        this.setState({noteList: list});
+
       }
     ).catch((err) => {
       console.log("Sending a note was unsucessful", err)
@@ -361,6 +382,7 @@ class NotesList extends Component {
       </div>
     );
   }
+  
 }
 
 export default NotesList;

@@ -195,13 +195,6 @@ class WeeklyCalendar extends React.Component {
             </div>
           </div>
         </div>
-        <PrimaryButton
-          onClick={() => {
-            console.log(this.state);
-          }}
-        >
-          TEST
-        </PrimaryButton>
       </div>
     );
   }

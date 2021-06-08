@@ -3,6 +3,7 @@ import axios from 'axios';
 import { setUserSession } from '../utils/Common';
 import { Paper, TextField } from "@material-ui/core";
 import { PrimaryButton, SecondaryButton } from "./Buttons";
+import { store } from "react-notifications-component";
 
 function Register(props) {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,20 @@ function Register(props) {
   const lastname = useFormInput('');
   const confirmPassword = useFormInput('');
   const [error, setError] = useState(null);
+  const notification = {
+    title: "Test notification",
+    message: "You shouldn't see it here.",
+    type: "success",
+    insert: "bottom",
+    container: "bottom-right",
+    animationIn: ["animate__animated", "animate__fadeIn"],
+    animationOut: ["animate__animated", "animate__fadeOut"],
+    dismiss: {
+      duration: 5000,
+      onScreen: true,
+    },
+  };
+
 
   const handleRegister = () => {
     // let userId;
@@ -19,18 +34,36 @@ function Register(props) {
     setLoading(true);
     if (confirmPassword.value !== password.value) {
       setLoading(false);
-      setError("Passwords don't match");
+      store.addNotification({
+        ...notification,
+        title: "Error!",
+        message: "Passwords don't match",
+        type: "danger",
+      });
+      // setError("Passwords don't match");
       return;
     }
     if (firstname.value === "" || lastname.value === "") {
       setLoading(false);
-      setError("Name cannot be empty");
+      store.addNotification({
+        ...notification,
+        title: "Error!",
+        message: "Name cannot be empty",
+        type: "danger",
+      });
+      // setError("Name cannot be empty");
       return;
     }
     var pattern=new RegExp("[A-Za-z]+$");
     if (!pattern.test(firstname.value) || !pattern.test(lastname.value)){
       setLoading(false);
-      setError("Names cannot contains numbers");
+      store.addNotification({
+        ...notification,
+        title: "Error!",
+        message: "Names cannot contain numbers",
+        type: "danger",
+      });
+      // setError("Names cannot contain numbers");
       return;
     }
     axios.post('http://localhost:8002/users', { username: username.value, password: password.value, firstname: firstname.value, lastname: lastname.value }).then(response => {
@@ -43,19 +76,43 @@ function Register(props) {
       }).catch(error => {
         setLoading(false);
         if (error.response.status !== 401 && error.response.status !== 400) {
-          setError("Something went wrong. Please try again later.");
+          store.addNotification({
+            ...notification,
+            title: "Error!",
+            message: "Something went wrong. Please try again later.",
+            type: "danger",
+          });
+          // setError("Something went wrong. Please try again later.");
           return;
         }
         console.log(error.response.data.errorKey);
         switch (error.response.data.errorKey) {
           case 'invalidCredentials':
-            setError("Invalid password or login");
+            store.addNotification({
+              ...notification,
+              title: "Error!",
+              message: "Invalid password or login",
+              type: "danger",
+            });
+            // setError("Invalid password or login");
             break;
           case 'userNotFound':
-            setError("Invalid password or login");
+            store.addNotification({
+              ...notification,
+              title: "Error!",
+              message: "Invalid password or login",
+              type: "danger",
+            });
+            // setError("Invalid password or login");
             break;
           default:
-            setError("Something went wrong. Please try again later.");
+            store.addNotification({
+              ...notification,
+              title: "Error!",
+              message: "Something went wrong. Please try again later.",
+              type: "danger",
+            });
+            // setError("Something went wrong. Please try again later.");
             break;
         }
       });
@@ -63,15 +120,33 @@ function Register(props) {
       setLoading(false);
       setLoading(false);
       if (error.response.status !== 500) {
+        store.addNotification({
+          ...notification,
+          title: "Error!",
+          message: "Something went wrong. Please try again later.",
+          type: "danger",
+        });
         setError("Something went wrong. Please try again later.");
         return;
       }
       console.log(error.response.data.errorKey);
       switch (error.response.data.errorKey) {
         case 'usernameOccupied':
-          setError("Username already in use");
+          store.addNotification({
+            ...notification,
+            title: "Error!",
+            message: "Username already in use.",
+            type: "danger",
+          });
+          // setError("Username already in use");
           break;
         default:
+          store.addNotification({
+            ...notification,
+            title: "Error!",
+            message: "Something went wrong. Please try again later.",
+            type: "danger",
+          });
           setError("Something went wrong. Please try again later.");
           break;
       }

@@ -324,7 +324,7 @@ app.put("/categories/:id", (req, res) => {
                 .send(`Category with id = ${req.body.id} already exists`);
             }
             var idx = data.Categories.findIndex((n) => n.id == req.params.id);
-            req.body.id = req.params.id;
+            req.body.id = parseInt(req.params.id);
             data.Categories[idx] = req.body;
             var newList = JSON.stringify(data);
             fs.writeFile(file_path, newList, (err) => {
@@ -509,7 +509,7 @@ app.put("/users/:id", (req, res) => {
                 }
             }
             var editedUser = {
-                id: req.params.id,
+                id: parseInt(req.params.id),
                 username: req.body.username != null ? req.body.username : user.username,
                 firstname: req.body.firstname != null ? req.body.firstname : user.firstname,
                 lastname: req.body.lastname != null ? req.body.lastname : user.lastname,

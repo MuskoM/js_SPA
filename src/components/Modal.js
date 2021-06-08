@@ -11,7 +11,7 @@ let Modal = (props) =>{
 
     console.log(props)
     const showHideClassName = props.show ? "modal display-block" : "modal display-none";
-    let c = props.categories[0].name
+    let c = props.categories[0].id
     let [selectedCategory,setSelectedCategory] = useState(c)
     let [title,setTitle] = useState()
     let [body,setBody] = useState()
@@ -19,7 +19,6 @@ let Modal = (props) =>{
     let [end,setEnd] = useState(add(new Date(), { hours: 3 }).toISOString().slice(0, -8))
     let [priority,setPriority] = useState()
     
-
     return(
         <div className={showHideClassName} id="addEventModal">
         <div className="modal-content" id="addEventModalContent">
